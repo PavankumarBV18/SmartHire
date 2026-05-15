@@ -113,12 +113,8 @@
 
           <!-- High-End Text Title -->
           <div class="flex flex-col leading-none">
-            <span
-              class="text-2xl md:text-3xl font-black font-heading tracking-tighter bg-gradient-to-br from-white to-slate-500 bg-clip-text text-transparent transform group-hover:tracking-normal transition-all duration-500">
+            <span class="text-2xl md:text-3xl font-black font-heading tracking-tighter text-white">
               Smart<span class="text-indigo-400">Hire</span>
-            </span>
-            <span class="text-[7px] md:text-[8px] font-bold uppercase tracking-[0.1em] text-blue-500/60 mt-1 pl-0.5">
-              An AI Driven Resume Intelligence And ATS Optimization System
             </span>
           </div>
         </a>
@@ -273,15 +269,7 @@
             </a>
           {% endif %}
 
-          <!-- AI Status Badge -->
-          <div class="flex items-center">
-            <div class="status-badge {{ 'status-online' if ai_ready else 'status-offline' }}">
-              <div
-                class="w-1.5 h-1.5 rounded-full {{ 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' if ai_ready else 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.6)]' }}">
-              </div>
-              AI {{ 'ACTIVE' if ai_ready else 'OFFLINE' }}
-            </div>
-          </div>
+
         </div>
 
         <!-- Mobile Menu Placeholder -->
@@ -312,6 +300,7 @@
   </main>
 
 
+  {% if request.path == '/' or request.path == '/home' or request.path == '/login' or request.path == '/register' or request.path == '/admin-login' or request.path == '/admin-register' %}
   <!-- Footer -->
   <footer class="py-12 border-t border-slate-800/50">
     <div class="container mx-auto px-6 text-center">
@@ -339,10 +328,11 @@
         <span class="text-2xl font-black tracking-tight text-white">Smart<span class="text-blue-400">Hire</span></span>
       </div>
       <div class="flex flex-col items-center gap-3">
-        <p class="text-slate-500 text-sm">&copy; 2025 SmartHire. Crafted for your career acceleration.</p>
+        <p class="text-slate-500 text-sm">&copy; 2025 SmartHire.</p>
       </div>
     </div>
   </footer>
+  {% endif %}
 
 
   <!-- Premium Feature Modal -->
