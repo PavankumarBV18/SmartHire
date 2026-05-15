@@ -25,8 +25,8 @@ def send_job_alert_email(to_email, job, matched_skills):
         logger.error(f"Invalid email address format provided: {to_email}. Aborting.")
         return False
         
-    sender_email = os.getenv("SMTP_EMAIL", "smarthire72@gmail.com")
-    sender_password = os.getenv("SMTP_PASSWORD", "")
+    sender_email = os.getenv("SMTP_EMAIL")
+    sender_password = os.getenv("SMTP_PASSWORD")
     
     if not sender_password or sender_password == "your_password":
         logger.error(f"SMTP_PASSWORD is not configured in .env. Cannot send to {to_email}. Aborting.")

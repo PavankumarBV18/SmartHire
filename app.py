@@ -39,7 +39,7 @@ load_dotenv(override=True)
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
+app.secret_key = os.getenv('SECRET_KEY') or os.urandom(24).hex() # Fallback to random if not set
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Vercel Compatibility: Use /tmp for writable directories
@@ -57,7 +57,7 @@ client = None
 if GROQ_API_KEY and GROQ_API_KEY.strip():
     try:
         client = Groq(api_key=GROQ_API_KEY)
-        print(f"Groq Client Successfully Initialized. Key: {GROQ_API_KEY[:7]}...{GROQ_API_KEY[-4:]}")
+        print("Groq Client Successfully Initialized.")
     except Exception as e:
         print(f"CRITICAL: Failed to initialize Groq client: {e}")
 else:

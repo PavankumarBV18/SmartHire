@@ -45,22 +45,40 @@
     }
   </style>
 
+  <!-- Tailwind CDN Fallback (Ensures UI renders even if static build fails) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            indigo: { 500: '#6366f1', 600: '#4f46e5' },
+          },
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
   {% block extra_css %}{% endblock %}
 </head>
 
-<body id="body">
+<body id="body" class="min-h-screen bg-[#020617] text-slate-200 overflow-x-hidden">
   <!-- Dynamic Mesh Background -->
   <div class="mesh-gradient"></div>
 
   <!-- Navigation -->
-  <nav class="navbar-blur py-3">
-    <div class="container mx-auto px-6">
+  <nav class="navbar-blur py-3 sticky top-0 z-[1000]">
+    <div class="container mx-auto px-6 max-w-7xl">
       <div class="flex justify-between items-center">
         <!-- Brand -->
         <a href="/" class="flex items-center gap-4 group">
           <!-- Premium Neural Audit Icon (SVG - No Text) -->
           <div
-            class="relative w-12 h-12 transform group-hover:scale-110 group-hover:rotate-2 transition-all duration-500">
+            class="relative w-10 h-10 md:w-12 md:h-12 transform group-hover:scale-110 group-hover:rotate-2 transition-all duration-500">
             <!-- Background Aura -->
             <div
               class="absolute inset-0 bg-blue-500/20 blur-xl rounded-full scale-125 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -106,14 +124,15 @@
           <!-- High-End Text Title -->
           <div class="flex flex-col leading-none">
             <span
-              class="text-3xl font-black font-heading tracking-tighter bg-gradient-to-br from-white to-slate-500 bg-clip-text text-transparent transform group-hover:tracking-normal transition-all duration-500">
+              class="text-2xl md:text-3xl font-black font-heading tracking-tighter bg-gradient-to-br from-white to-slate-500 bg-clip-text text-transparent transform group-hover:tracking-normal transition-all duration-500">
               Smart<span class="text-indigo-400">Hire</span>
             </span>
-            <span class="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-500/60 mt-1 pl-0.5">
+            <span class="text-[7px] md:text-[8px] font-bold uppercase tracking-[0.1em] text-blue-500/60 mt-1 pl-0.5">
               An AI Driven Resume Intelligence And ATS Optimization System
             </span>
           </div>
         </a>
+        <!-- Rest of nav... -->
 
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-8">
