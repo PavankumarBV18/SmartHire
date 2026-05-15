@@ -1,0 +1,30 @@
+[
+  {
+    "id": "8da22d8c-e956-48ff-accd-70ef9d1e708f",
+    "timestamp": "2026-02-27T14:39:27.021382",
+    "rating": 3,
+    "comment": "good",
+    "page": "/upload-home"
+  },
+  {
+    "id": "56c91a17-7752-42a2-908a-5d8a7532caa4",
+    "timestamp": "2026-03-09T13:03:16.140377",
+    "rating": 3,
+    "comment": "",
+    "page": "/jd-result/52195280-4917-49c2-885b-5e59852657f8"
+  },
+  {
+    "id": "23ce07bd-df05-49a4-9956-1223860f531a",
+    "timestamp": "2026-04-01T16:21:12.712472",
+    "rating": 5,
+    "comment": "",
+    "page": "/admin-job-alert"
+  },
+  {
+    "id": "d337ede6-e799-4307-9cb5-3dcf4d501cbc",
+    "timestamp": "2026-04-02T11:58:38.938110",
+    "rating": 3,
+    "comment": "",
+    "page": "/admin-job-alert"
+  }
+]

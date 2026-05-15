@@ -1,0 +1,897 @@
+<!-- ==================== templates/base.html ==================== -->
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}SmartHire - An AI Driven Resume Intelligence And ATS Optimization System{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
+  <!-- Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS Static -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind_dist.css') }}">
+
+  <!-- Intro.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
+  
+  <!-- Global Custom Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorial.css') }}">
+
+  <!-- Chart.js for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* Inline Overrides for Dynamic Transitions */
+    .chat-window {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: bottom right;
+    }
+
+    .chat-window.hidden {
+      opacity: 0 !important;
+      transform: scale(0.95) translateY(20px) !important;
+      pointer-events: none !important;
+      display: flex !important;
+      /* Keep for transition */
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body id="body">
+  <!-- Dynamic Mesh Background -->
+  <div class="mesh-gradient"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar-blur py-3">
+    <div class="container mx-auto px-6">
+      <div class="flex justify-between items-center">
+        <!-- Brand -->
+        <a href="/" class="flex items-center gap-4 group">
+          <!-- Premium Neural Audit Icon (SVG - No Text) -->
+          <div
+            class="relative w-12 h-12 transform group-hover:scale-110 group-hover:rotate-2 transition-all duration-500">
+            <!-- Background Aura -->
+            <div
+              class="absolute inset-0 bg-blue-500/20 blur-xl rounded-full scale-125 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+
+            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_20px_rgba(99,102,241,0.6)]">
+              <defs>
+                <linearGradient id="shGradFinal" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#6366f1" />
+                  <stop offset="100%" style="stop-color:#10b981" />
+                </linearGradient>
+                <filter id="monogramGlow">
+                  <feGaussianBlur stdDeviation="1.5" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Glass Base -->
+              <rect x="15" y="15" width="70" height="70" rx="22" fill="rgba(15,23,42,0.85)" stroke="url(#shGradFinal)"
+                stroke-width="1.5" />
+
+              <!-- Monogram SH (Separated Design) -->
+              <g stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#monogramGlow)">
+                <!-- H Pillars (Indigo) -->
+                <path d="M25 30 V70" stroke="#6366f1" stroke-width="10" />
+                <path d="M75 30 V70" stroke="#6366f1" stroke-width="10" />
+
+                <!-- S Curve (Compact White) -->
+                <path d="M42 38 H58 C64 38, 64 48, 58 48 H42 C36 48, 36 58, 42 58 H58" stroke="white" stroke-width="8"
+                  transform="translate(0, 2)" />
+
+                <!-- H Crossbar (Subtle) -->
+                <path d="M25 50 H75" stroke="#6366f1" stroke-width="10" opacity="0.15" />
+              </g>
+
+              <!-- Intelligence Core -->
+              <circle cx="50" cy="50" r="3" fill="#10b981">
+                <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </svg>
+          </div>
+
+          <!-- High-End Text Title -->
+          <div class="flex flex-col leading-none">
+            <span
+              class="text-3xl font-black font-heading tracking-tighter bg-gradient-to-br from-white to-slate-500 bg-clip-text text-transparent transform group-hover:tracking-normal transition-all duration-500">
+              Smart<span class="text-indigo-400">Hire</span>
+            </span>
+            <span class="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-500/60 mt-1 pl-0.5">
+              An AI Driven Resume Intelligence And ATS Optimization System
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          {% if session.get('user') %}
+          <a href="/dashboard" id="nav-dashboard"
+            class="text-sm font-medium text-indigo-400 hover:text-white transition-colors flex items-center gap-1.5">
+            <i class="fas fa-tachometer-alt opacity-50"></i> Dashboard
+          </a>
+          
+          <div class="nav-popup-container">
+            <a href="/analyze-jd" id="nav-jd-analyzer"
+              class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 py-2">
+              <i class="fas fa-crosshairs opacity-50"></i> JD Analyzer
+              <span class="nav-popup-underline"></span>
+            </a>
+            <div class="nav-popup">
+              <div class="nav-popup-content">
+                <div class="nav-popup-glow"></div>
+                <div class="flex flex-col gap-3">
+                  <div class="flex items-start gap-3">
+                    <div class="nav-popup-icon-wrapper">
+                      <i class="fas fa-search text-[#00ffcc] text-lg"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-sm leading-snug mt-0.5">AI-Powered JD Analyzer</h3>
+                  </div>
+                  <p class="text-gray-400 text-xs leading-relaxed font-light text-left">Analyze job descriptions instantly and identify the exact ATS keywords.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-popup-container">
+            <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/interview-questions{% else %}javascript:showPremiumModal(){% endif %}"
+              id="nav-interview-prep"
+              class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 py-2">
+              <i class="fas fa-microphone opacity-50 nav-icon-enlarge"></i> Interview Prep
+              <span class="nav-popup-underline"></span>
+            </a>
+            <div class="nav-popup-interview">
+              <div class="nav-popup-content nav-popup-breathing-border">
+                <div class="nav-popup-glow"></div>
+                <div class="flex flex-col gap-3 relative z-10">
+                  <div class="flex items-start gap-3">
+                    <div class="nav-popup-icon-wrapper">
+                      <i class="fas fa-microphone text-[#00ffcc] text-lg"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-sm leading-snug mt-0.5">AI Interview Hub</h3>
+                  </div>
+                  <p class="text-gray-400 text-xs leading-relaxed font-light text-left">Practice real-time questions and boost confidence.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Premium Tools Dropdown -->
+          <div class="relative group">
+            <button class="text-sm font-medium text-slate-300 group-hover:text-white transition-colors flex items-center gap-1.5 py-2">
+              <i class="fas fa-toolbox opacity-50"></i> AI Tools
+              <i class="fas fa-chevron-down text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
+            </button>
+            <div class="absolute left-0 top-full mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left group-hover:scale-100 scale-95 z-50">
+              <div class="p-2">
+                <a href="/enhance-content" id="nav-enhancer" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors">
+                  <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <i class="fas fa-wand-sparkles"></i>
+                  </div>
+                  <div>
+                    <div class="font-bold">Content Enhancer</div>
+                    <div class="text-[10px] text-slate-500">Upgrade your bullets</div>
+                  </div>
+                </a>
+                <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/compare-resumes{% else %}javascript:showPremiumModal(){% endif %}" id="nav-compare" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors">
+                  <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <i class="fas fa-code-compare"></i>
+                  </div>
+                  <div>
+                    <div class="font-bold">Resume Comparison</div>
+                    <div class="text-[10px] text-slate-500">Version VS Version</div>
+                  </div>
+                </a>
+                <div class="h-px bg-slate-700/50 my-1"></div>
+                <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/market-demand{% else %}javascript:showPremiumModal(){% endif %}" id="nav-market-trends" class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors">
+                  <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <div>
+                    <div class="font-bold">Market Demand</div>
+                    <div class="text-[10px] text-slate-500">Trending Skills 2025</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <a href="/home" id="nav-home"
+            class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-1.5">
+            <i class="fas fa-home opacity-50"></i> Home
+          </a>
+          <a href="/tips"
+            class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-1.5">
+            <i class="fas fa-lightbulb opacity-50"></i> Tips
+          </a>
+          {% endif %}
+
+          {% if session.get('user') %}
+
+            
+            <a href="/subscription" class="text-sm font-medium transition-colors flex items-center gap-1.5 px-3 py-1 rounded-full 
+              {% if session.get('user') == 'smarthire72@gmail.com' or session.get('role') == 'admin' %} text-indigo-400 bg-indigo-500/10 border border-indigo-500/20
+              {% elif session.get('plan') == 'premium' %} text-amber-400 bg-amber-500/10 border border-amber-500/20
+              {% else %} text-slate-300 bg-slate-800 border border-slate-700 {% endif %}">
+              <i class="fas fa-crown"></i> 
+              {% if session.get('user') == 'smarthire72@gmail.com' or session.get('role') == 'admin' %} ADMIN
+              {% elif session.get('plan') == 'premium' %} PREMIUM USER
+              {% else %} FREE USER {% endif %}
+            </a>
+            
+            <div class="relative group">
+              <button class="flex items-center gap-2 text-sm font-medium text-slate-300 hover:text-white transition-colors py-2">
+                <i class="fas fa-user-circle text-lg opacity-80"></i>
+                <span class="max-w-[100px] truncate">{{ session.get('user').split('@')[0] }}</span>
+                <i class="fas fa-chevron-down text-xs opacity-50"></i>
+              </button>
+              <div class="absolute right-0 top-full mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right group-hover:scale-100 scale-95 z-50">
+                <div class="p-2">
+                  {% if session.get('role') == 'admin' %}
+                  <a href="/admin-dashboard" class="block px-4 py-2 text-sm text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors font-bold">
+                    <i class="fas fa-tachometer-alt mr-2 opacity-70"></i> Admin Dashboard
+                  </a>
+                  <div class="h-px bg-slate-700/50 my-1"></div>
+                  {% endif %}
+                  <a href="/saved-resumes?email={{ session.get('user') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors">
+                    <i class="fas fa-file-alt mr-2 opacity-70"></i> My Resumes
+                  </a>
+                  <div class="h-px bg-slate-700/50 my-1"></div>
+                  <a href="/logout" class="block px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2 opacity-70"></i> Logout
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <a href="/login" class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 py-2">
+              <i class="fas fa-sign-in-alt opacity-50"></i> Login
+            </a>
+            <a href="/register" class="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors px-4 py-1.5 rounded-full shadow-lg shadow-indigo-500/25">
+              Sign Up
+            </a>
+          {% endif %}
+
+          <!-- AI Status Badge -->
+          <div class="flex items-center">
+            <div class="status-badge {{ 'status-online' if ai_ready else 'status-offline' }}">
+              <div
+                class="w-1.5 h-1.5 rounded-full {{ 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' if ai_ready else 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.6)]' }}">
+              </div>
+              AI {{ 'ACTIVE' if ai_ready else 'OFFLINE' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Placeholder -->
+        <button class="md:hidden text-white">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="container mx-auto px-6 mt-4">
+    {% for category, message in messages %}
+    <div
+      class="p-4 mb-4 rounded-xl border {{ 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' if category == 'success' else 'bg-red-500/10 border-red-500/30 text-red-400' if category == 'error' else 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' }} fade-in">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  <main class="min-h-[70vh] py-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Simple Feedback Section -->
+  <section class="py-20 border-t border-slate-800/50 bg-slate-900/20">
+    <div class="container mx-auto px-6 max-w-xl text-center">
+      <div class="glass-card p-8">
+        <h3 class="text-2xl font-bold text-white mb-2 font-heading">Level up with SmartHire?</h3>
+        <p class="text-slate-400 mb-8">Your feedback helps us make the ecosystem better.</p>
+
+        <div id="feedback-form" class="space-y-6">
+          <div class="flex justify-center gap-3">
+            <button onclick="setRating(1)"
+              class="star-rating w-12 h-12 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center text-slate-500 hover:bg-slate-700 hover:text-amber-400 transition-all text-xl"
+              data-rating="1">
+              <i class="fas fa-star"></i>
+            </button>
+            <button onclick="setRating(2)"
+              class="star-rating w-12 h-12 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center text-slate-500 hover:bg-slate-700 hover:text-amber-400 transition-all text-xl"
+              data-rating="2">
+              <i class="fas fa-star"></i>
+            </button>
+            <button onclick="setRating(3)"
+              class="star-rating w-12 h-12 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center text-slate-500 hover:bg-slate-700 hover:text-amber-400 transition-all text-xl"
+              data-rating="3">
+              <i class="fas fa-star"></i>
+            </button>
+            <button onclick="setRating(4)"
+              class="star-rating w-12 h-12 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center text-slate-500 hover:bg-slate-700 hover:text-amber-400 transition-all text-xl"
+              data-rating="4">
+              <i class="fas fa-star"></i>
+            </button>
+            <button onclick="setRating(5)"
+              class="star-rating w-12 h-12 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center text-slate-500 hover:bg-slate-700 hover:text-amber-400 transition-all text-xl"
+              data-rating="5">
+              <i class="fas fa-star"></i>
+            </button>
+          </div>
+
+          <textarea id="feedback-comment" rows="2"
+            class="w-full bg-slate-800/30 border border-slate-700 rounded-xl p-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-sans"
+            placeholder="Any suggestions?"></textarea>
+
+          <button onclick="submitFeedback()" class="w-full btn-premium btn-primary py-3">
+            Send Feedback
+          </button>
+        </div>
+
+        <div id="feedback-success" class="hidden py-4 text-emerald-400 font-medium">
+          <i class="fas fa-circle-check mr-2"></i> Feedback received. Thank you!
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 border-t border-slate-800/50">
+    <div class="container mx-auto px-6 text-center">
+      <div class="flex justify-center space-x-6 mb-6">
+        <a href="#" class="text-slate-500 hover:text-white transition-colors"><i class="fab fa-github"></i></a>
+        <a href="#" class="text-slate-500 hover:text-white transition-colors"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="text-slate-500 hover:text-white transition-colors"><i class="fab fa-twitter"></i></a>
+      </div>
+      <div
+        class="flex items-center justify-center gap-4 mb-8 opacity-60 hover:opacity-100 transition-opacity duration-500">
+        <div class="w-12 h-12">
+          <svg viewBox="0 0 100 100" class="w-full h-full opacity-80 hover:opacity-100 transition-opacity">
+            <rect x="15" y="15" width="70" height="70" rx="22" fill="rgba(15,23,42,0.4)" stroke="white"
+              stroke-opacity="0.2" stroke-width="1.5" />
+            <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <!-- H -->
+              <path d="M25 30 V70" stroke="#6366f1" stroke-width="10" />
+              <path d="M75 30 V70" stroke="#6366f1" stroke-width="10" />
+              <!-- S -->
+              <path d="M42 38 H58 C64 38, 64 48, 58 48 H42 C36 48, 36 58, 42 58 H58" stroke="white" stroke-width="8"
+                transform="translate(0, 2)" />
+            </g>
+          </svg>
+        </div>
+        <span class="text-2xl font-black tracking-tight text-white">Smart<span class="text-blue-400">Hire</span></span>
+      </div>
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-slate-500 text-sm">&copy; 2025 SmartHire. Crafted for your career acceleration.</p>
+        {% if request.path not in ['/', '/login', '/register', '/admin-key-verify', '/admin-login', '/admin-register'] %}
+        <button onclick="replayTutorial()" class="text-xs text-indigo-400 hover:text-white transition-colors flex items-center gap-2 border border-indigo-500/20 bg-indigo-500/10 px-3 py-1.5 rounded-full"><i class="fas fa-play-circle"></i> Replay Tutorial</button>
+        {% endif %}
+      </div>
+      <div
+        class="flex items-center justify-center gap-2 mt-4 text-xs font-semibold uppercase tracking-widest text-indigo-500/60">
+        <span class="w-8 h-px bg-indigo-500/20"></span>
+        Powered by Groq Neural Engine
+        <span class="w-8 h-px bg-indigo-500/20"></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Chatbot UI (Modernized) -->
+  <div class="fixed bottom-6 right-6 z-[1001]">
+    <!-- Chat Window -->
+    <div id="chat-window"
+      class="chat-window hidden glass-card w-80 sm:w-96 flex flex-col mb-4 overflow-hidden shadow-2xl">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 px-5 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+            <i class="fas fa-brain text-white text-sm"></i>
+          </div>
+          <div class="text-sm">
+            <div class="font-bold text-white">AI Career Assistant</div>
+            <div class="text-[10px] text-indigo-200 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online
+            </div>
+          </div>
+        </div>
+        <button onclick="toggleChat()" class="text-indigo-100 hover:text-white transition-colors p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Messages -->
+      <div id="chat-messages" class="flex-1 p-5 overflow-y-auto bg-slate-900/40 text-sm space-y-4 max-h-[400px]">
+        <div class="flex justify-start">
+          <div
+            class="bg-slate-800 border border-slate-700 text-slate-200 py-3 px-4 rounded-2xl rounded-bl-none shadow-sm max-w-[85%]">
+            Welcome to SmartHire! How can I help you optimize your professional profile today?
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="p-4 bg-slate-900/60 border-t border-slate-800">
+        <div
+          class="flex items-center gap-2 bg-slate-800/80 rounded-2xl px-4 py-2 border border-slate-700 focus-within:border-indigo-500/50 transition-colors">
+          <input type="text" id="chat-input"
+            class="bg-transparent flex-1 focus:outline-none text-white text-sm placeholder-slate-500"
+            placeholder="Ask anything about resumes...">
+          <button id="voice-btn"
+            class="w-8 h-8 rounded-lg bg-slate-700 text-slate-300 flex items-center justify-center hover:bg-slate-600 transition-all flex-shrink-0 select-none cursor-pointer" title="Click to toggle listening">
+            <i class="fas fa-microphone text-xs"></i>
+          </button>
+          <button onclick="sendChatMessage()"
+            class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-500 transition-all flex-shrink-0">
+            <i class="fas fa-paper-plane text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button onclick="toggleChat()"
+      class="w-16 h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-[0_8px_25px_rgba(79,70,229,0.4)] transform hover:-translate-y-1 transition-all duration-300">
+      <i id="chat-icon" class="fas fa-comment-dots text-2xl"></i>
+    </button>
+  </div>
+
+  <!-- Premium Feature Modal -->
+  <div id="premium-modal" class="fixed inset-0 z-[2000] hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="hidePremiumModal()"></div>
+    <div class="glass-card p-10 max-w-md w-full relative z-10 border border-indigo-500/30 text-center animate-in fade-in zoom-in duration-300">
+        <div class="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">🔒 Premium Feature</h2>
+        <p class="text-slate-400 mb-8">Subscribe to unlock this feature and skyrocket your career with AI intelligence.</p>
+        <div class="flex flex-col gap-3">
+            <a href="/subscription" class="btn-premium btn-primary py-3 px-6 text-sm uppercase tracking-widest font-black shadow-lg">
+                ⭐ Upgrade Subscription
+            </a>
+            <button onclick="hidePremiumModal()" class="py-3 px-6 text-slate-500 hover:text-white transition-colors text-xs uppercase tracking-widest font-bold">
+                Maybe Later
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    function showPremiumModal() {
+        document.getElementById('premium-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    function hidePremiumModal() {
+        document.getElementById('premium-modal').classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    // Navigation Scroll Effect
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      if (window.scrollY > 50) {
+        nav.classList.add('py-2');
+        nav.classList.remove('py-3');
+      } else {
+        nav.classList.add('py-3');
+        nav.classList.remove('py-2');
+      }
+    });
+
+    // Voice interaction variables
+    let recognition;
+    let isListening = false;
+    let synth = window.speechSynthesis;
+    let currentUtterance = null;
+    let retryCount = 0;
+    let finalTranscriptBuffer = '';
+    let isButtonPressed = false;
+    let processingDelay;
+
+    // Initialize Speech Recognition
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true; // Essential for handling pauses
+      recognition.interimResults = true;
+      recognition.lang = 'en-IN'; // Default to en-IN, falls back automatically by browser if needed
+
+      recognition.onstart = function() {
+        isListening = true;
+        const voiceBtn = document.getElementById('voice-btn');
+        voiceBtn.classList.remove('bg-slate-700', 'text-slate-300');
+        voiceBtn.classList.add('bg-red-500', 'text-white', 'animate-pulse');
+        voiceBtn.innerHTML = '<i class="fas fa-microphone-lines text-xs"></i>';
+        document.getElementById('chat-input').placeholder = "🎤 Listening...";
+      };
+
+      recognition.onresult = function(event) {
+        let interimTranscript = '';
+        let currentFinal = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            currentFinal += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        
+        if (currentFinal) {
+          finalTranscriptBuffer += (finalTranscriptBuffer ? ' ' : '') + currentFinal.trim();
+        }
+        
+        document.getElementById('chat-input').value = finalTranscriptBuffer + (interimTranscript ? ' ' + interimTranscript : '');
+        retryCount = 0; // Reset retry count if we got speech
+      };
+
+      recognition.onerror = function(event) {
+        console.error("Speech recognition error", event.error);
+        if (event.error === 'no-speech' && retryCount < 1) {
+            // Auto retry once
+            retryCount++;
+            try { recognition.start(); } catch(e) {}
+            return;
+        }
+        
+        stopListening(true);
+        let errorMsg = '❌ Speech not recognized, try again';
+        if (event.error === 'not-allowed') {
+          errorMsg = '❌ Microphone access denied. Please check permissions.';
+        } else if (event.error === 'network') {
+          errorMsg = '❌ Network error during speech recognition.';
+        }
+        appendMessage('system', errorMsg);
+      };
+
+      recognition.onend = function() {
+        stopListening();
+        
+        if (finalTranscriptBuffer.trim() || document.getElementById('chat-input').value.trim()) {
+            finalTranscriptBuffer = finalTranscriptBuffer.trim() || document.getElementById('chat-input').value.trim();
+           document.getElementById('chat-input').value = finalTranscriptBuffer.trim();
+           finalTranscriptBuffer = '';
+           document.getElementById('chat-input').placeholder = "Ask anything about resumes...";
+        } else {
+            document.getElementById('chat-input').placeholder = "Ask anything about resumes...";
+        }
+      };
+    } else {
+        console.warn("Speech Recognition not supported in this browser.");
+    }
+
+    function toggleVoiceInput(e) {
+      if (e) e.preventDefault();
+      
+      // Voice Assistant is now FREE for everyone
+      if (false) { // Skip premium check
+          window.location.href = "/premium-locked";
+          return;
+      }
+      
+      if (isListening) {
+          recognition.stop();
+          return;
+      }
+
+      // Unlock SpeechSynthesis on first interaction to bypass autoplay policies
+      if (synth && !synth.speaking) {
+          let silentUtterance = new SpeechSynthesisUtterance('');
+          silentUtterance.volume = 0;
+          synth.speak(silentUtterance);
+      }
+
+      if (!recognition) {
+        appendMessage('system', '❌ Voice input is not supported. Please use Google Chrome.');
+        return;
+      }
+      if (synth && synth.speaking) {
+        synth.cancel();
+      }
+      finalTranscriptBuffer = '';
+      retryCount = 0;
+      document.getElementById('chat-input').value = '';
+      try {
+          recognition.start();
+      } catch(err) {
+          // Already started
+      }
+    }
+
+    function stopListening(isError = false) {
+      isListening = false;
+      const voiceBtn = document.getElementById('voice-btn');
+      if (voiceBtn) {
+          voiceBtn.classList.remove('bg-red-500', 'text-white', 'animate-pulse');
+          voiceBtn.classList.add('bg-slate-700', 'text-slate-300');
+          voiceBtn.innerHTML = '<i class="fas fa-microphone text-xs"></i>';
+      }
+      const chatInput = document.getElementById('chat-input');
+      if (chatInput && isError) {
+          chatInput.placeholder = "Ask anything about resumes...";
+          finalTranscriptBuffer = '';
+      }
+    }
+
+    // Attach event listeners for toggle once DOM is loaded
+    document.addEventListener("DOMContentLoaded", () => {
+        const voiceBtn = document.getElementById('voice-btn');
+        if (voiceBtn) {
+            voiceBtn.addEventListener('click', toggleVoiceInput);
+        }
+        
+        // Check browser support on load to warn user if needed
+        if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+             if (voiceBtn) {
+                 voiceBtn.title = "Not supported in this browser";
+                 voiceBtn.classList.add('opacity-50', 'cursor-not-allowed');
+             }
+        }
+    });
+
+    function speakText(text) {
+      if (!synth) return;
+      
+      if (synth.speaking) {
+        synth.cancel();
+      }
+      
+      const plainText = text.replace(/<[^>]+>/g, '').replace(/\*\*(.*?)\*\*/g, '$1');
+      currentUtterance = new SpeechSynthesisUtterance(plainText);
+      currentUtterance.lang = 'en-US';
+      currentUtterance.rate = 1.0;
+      
+      synth.speak(currentUtterance);
+    }
+
+    function toggleSpeechPlay(btn) {
+      if (synth && synth.speaking) {
+        if (synth.paused) {
+          synth.resume();
+          btn.innerHTML = '<i class="fas fa-pause text-[10px]"></i>';
+        } else {
+          synth.pause();
+          btn.innerHTML = '<i class="fas fa-play text-[10px]"></i>';
+        }
+      } else {
+          const textDiv = btn.previousElementSibling;
+          if (textDiv) {
+              speakText(textDiv.innerText);
+              btn.innerHTML = '<i class="fas fa-pause text-[10px]"></i>';
+          }
+      }
+    }
+
+    // Chatbot functionality
+    function toggleChat() {
+      const chatWindow = document.getElementById('chat-window');
+      const chatIcon = document.getElementById('chat-icon');
+
+      if (chatWindow.classList.contains('hidden')) {
+        chatWindow.classList.remove('hidden');
+        chatIcon.classList.remove('fa-comment-dots');
+        chatIcon.classList.add('fa-times');
+        setTimeout(() => document.getElementById('chat-input').focus(), 100);
+      } else {
+        chatWindow.classList.add('hidden');
+        chatIcon.classList.remove('fa-times');
+        chatIcon.classList.add('fa-comment-dots');
+      }
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+      const messagesDiv = document.getElementById('chat-messages');
+
+      if (!message) return;
+
+      // User Message
+      appendMessage('user', message);
+      input.value = '';
+
+      // Loading indicator
+      const loadingId = 'loading-' + Date.now();
+      const loadingHtml = `
+            <div id="${loadingId}" class="flex justify-start">
+                <div class="bg-slate-800 text-slate-400 py-2 px-4 rounded-2xl rounded-bl-none italic text-xs">
+                    <i class="fas fa-circle-notch fa-spin mr-2"></i> Thinking...
+                </div>
+            </div>
+        `;
+      messagesDiv.insertAdjacentHTML('beforeend', loadingHtml);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: message }),
+        });
+
+        const data = await response.json();
+        document.getElementById(loadingId).remove();
+
+        if (data.error) {
+          appendMessage('system', 'Error: ' + data.error);
+        } else {
+          appendMessage('bot', data.response);
+          speakText(data.response);
+        }
+      } catch (error) {
+        document.getElementById(loadingId).remove();
+        appendMessage('system', 'Unable to connect to AI server.');
+      }
+    }
+
+    function appendMessage(sender, text) {
+      const messagesDiv = document.getElementById('chat-messages');
+      let html = '';
+
+      if (sender === 'user') {
+        html = `
+                <div class="flex justify-end">
+                    <div class="bg-indigo-600 text-white py-3 px-4 rounded-2xl rounded-br-none shadow-sm max-w-[85%]">
+                        ${text}
+                    </div>
+                </div>
+            `;
+      } else if (sender === 'bot') {
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>');
+        formattedText = formattedText.replace(/\n/g, '<br>');
+
+        html = `
+                <div class="flex justify-start relative group w-full">
+                    <div class="bg-slate-800 border border-slate-700 text-slate-200 py-3 px-4 rounded-2xl rounded-bl-none shadow-sm max-w-[85%] pr-10">
+                        ${formattedText}
+                    </div>
+                    <button onclick="toggleSpeechPlay(this)" class="absolute right-[15%] top-2 w-6 h-6 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ml-2" title="Play/Pause Voice">
+                        <i class="fas fa-pause text-[10px]"></i>
+                    </button>
+                </div>
+            `;
+      } else {
+        html = `<div class="text-center py-2"><span class="text-[10px] text-red-500 opacity-80 uppercase tracking-widest font-bold">${text}</span></div>`;
+      }
+
+      messagesDiv.insertAdjacentHTML('beforeend', html);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Feedback functionality
+    let currentRating = 0;
+    function setRating(rating) {
+      currentRating = rating;
+      const stars = document.querySelectorAll('.star-rating');
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.replace('text-slate-500', 'text-amber-400');
+          star.classList.add('bg-amber-400/10', 'border-amber-400/30');
+        } else {
+          star.classList.replace('text-amber-400', 'text-slate-500');
+          star.classList.remove('bg-amber-400/10', 'border-amber-400/30');
+        }
+      });
+    }
+
+    async function submitFeedback() {
+      if (currentRating === 0) return;
+
+      const comment = document.getElementById('feedback-comment').value;
+      const btn = document.querySelector('button[onclick="submitFeedback()"]');
+      const originalText = btn.innerHTML;
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+
+      try {
+        const response = await fetch('/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating: currentRating, comment: comment, page: window.location.pathname }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          document.getElementById('feedback-form').classList.add('hidden');
+          document.getElementById('feedback-success').classList.remove('hidden');
+        }
+      } catch (error) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Handle Enter key for chat
+    document.getElementById('chat-input')?.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendChatMessage();
+      }
+    });
+
+    // Dark Mode LocalStorage management (Keeping it for future toggle, but setting default to dark)
+    document.addEventListener("DOMContentLoaded", function () {
+      // Default to premium dark theme
+      document.getElementById("body").classList.add("dark-mode");
+    });
+  </script>
+
+  <!-- Tutorial Modals -->
+  <!-- Welcome Modal -->
+  <div class="tut-modal-overlay" id="tutorial-welcome-modal">
+    <div class="tut-modal">
+      <div class="tut-modal-glow"></div>
+      <div class="tut-modal-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <h2 class="text-3xl font-bold text-white mb-2 font-heading">Welcome to SmartHire</h2>
+      <p class="text-slate-400 text-sm mb-6 max-w-sm mx-auto">Your AI-powered career intelligence and interview preparation platform.</p>
+      
+      <div class="flex flex-col gap-3 text-left text-slate-300 text-sm bg-slate-800/50 p-4 rounded-xl mb-6 border border-slate-700/50">
+        <div class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Analyze resumes & improve ATS scores</div>
+        <div class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Detect missing skills & compare with JDs</div>
+        <div class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Generate learning roadmaps</div>
+        <div class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Prepare for interviews with AI</div>
+      </div>
+
+      <div class="flex gap-4 justify-center">
+        <button onclick="skipTutorial()" class="px-6 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm font-semibold">Skip Tutorial</button>
+        <button onclick="startTutorial()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-500 text-white font-semibold hover:shadow-[0_0_20px_rgba(0,255,204,0.3)] transition-all text-sm">Start Tour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completion Modal -->
+  <div class="tut-modal-overlay" id="tutorial-completion-modal">
+    <div class="tut-modal">
+      <div class="tut-modal-glow"></div>
+      <div class="tut-modal-icon" style="color: #a855f7; border-color: rgba(168,85,247,0.3); background: rgba(168,85,247,0.1); box-shadow: 0 0 20px rgba(168,85,247,0.2);">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <h2 class="text-3xl font-bold text-white mb-2 font-heading">Tutorial Completed! 🎉</h2>
+      <p class="text-slate-400 text-sm mb-8 max-w-sm mx-auto">You are now ready to explore SmartHire and accelerate your career journey to the next level.</p>
+      
+      <div class="flex gap-4 justify-center">
+        <button onclick="replayTutorial()" class="px-6 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm font-semibold">Replay Tutorial</button>
+        <button onclick="hideCompletionModal()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all text-sm">Explore Platform</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro.js JS -->
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Tutorial JS -->
+  <script src="{{ url_for('static', filename='js/tutorial.js') }}"></script>
+
+  <!-- Tutorial Trigger -->
+  {% if show_tutorial %}
+  <script>
+    localStorage.removeItem('smarthire_tutorial_completed');
+    localStorage.setItem('smarthire_force_tutorial', 'true');
+  </script>
+  {% endif %}
+
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

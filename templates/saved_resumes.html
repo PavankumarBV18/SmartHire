@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Resumes - SmartHire{% endblock %}
+
+{% block content %}
+<div class="px-6 mx-auto mt-10 max-w-7xl lg:px-8">
+    
+    <div class="mb-10 text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-transparent sm:text-4xl bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text">
+            My Resumes
+        </h2>
+        <p class="mt-4 text-lg text-gray-400">Access all your previously analyzed resumes and generated versions.</p>
+    </div>
+
+    {% if not resumes %}
+        <div class="p-8 text-center bg-gray-800/30 border border-gray-700/30 rounded-2xl">
+            <p class="text-gray-400">No saved resumes found.</p>
+        </div>
+    {% elif resumes %}
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {% for resume in resumes %}
+            <div class="relative flex flex-col p-6 bg-gray-800/80 border border-gray-700 rounded-2xl transition-all hover:bg-gray-800 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10">
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white line-clamp-1" title="{{ resume.resume_name }}">{{ resume.resume_name }}</h3>
+                        <p class="text-sm text-gray-400 mt-1">Date: {{ resume.created_at[:10] }}</p>
+                    </div>
+                    {% if resume.ats_score %}
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full {% if resume.ats_score >= 80 %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% elif resume.ats_score >= 60 %}bg-yellow-500/10 text-yellow-400 border border-yellow-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+                        <span class="font-bold">{{ resume.ats_score }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="flex-1 mb-6">
+                    <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Skills:</h4>
+                    <div class="flex flex-wrap gap-2">
+                        {% for skill in resume.skills[:5] %}
+                            <span class="px-2.5 py-1 text-xs font-medium text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 rounded-full">
+                                {{ skill }}
+                            </span>
+                        {% endfor %}
+                        {% if resume.skills|length > 5 %}
+                            <span class="px-2.5 py-1 text-xs font-medium text-gray-400 bg-gray-800 border border-gray-700 rounded-full">
+                                +{{ resume.skills|length - 5 }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 pt-4 mt-auto border-t border-gray-700/50">
+                    <a href="{{ url_for('view_resume_pdf', resume_id=resume.id) }}" target="_blank" class="flex-1 px-4 py-2 text-sm font-semibold text-center text-white transition-colors bg-gray-700 bg-opacity-50 rounded-lg hover:bg-gray-600">
+                        View
+                    </a>
+                    
+                    <a href="{{ url_for('download_resume_pdf', resume_id=resume.id) }}" class="flex-1 px-4 py-2 text-sm font-semibold text-center text-white transition-colors bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg hover:from-emerald-400 hover:to-teal-400">
+                        Download
+                    </a>
+
+                    <form action="{{ url_for('delete_resume', resume_id=resume.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this resume?');" class="inline">
+                        <button type="submit" class="p-2 text-red-400 transition-colors bg-red-400/10 border border-red-400/20 rounded-lg hover:bg-red-500 hover:text-white" title="Delete Resume">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

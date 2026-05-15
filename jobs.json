@@ -1,0 +1,46 @@
+[
+    {
+        "title": "testing",
+        "company": "kpmg",
+        "skills": [
+            "html"
+        ],
+        "description": "testing",
+        "location": "tumkur",
+        "apply_link": "http://localhost:5001/admin-job-alert"
+    },
+    {
+        "title": "Data Science",
+        "company": "IBM",
+        "skills": [
+            "Html",
+            "css"
+        ],
+        "description": "Data Science",
+        "location": "GOA",
+        "apply_link": "http://localhost:5001/admin-job-alert"
+    },
+    {
+        "title": "web developer",
+        "company": "IBM",
+        "skills": [
+            "python",
+            "css",
+            "html"
+        ],
+        "description": "webdeveloper",
+        "location": "tumkur",
+        "apply_link": "http://localhost:5001/admin-job-alert"
+    },
+    {
+        "title": "web development",
+        "company": "ERA",
+        "skills": [
+            "css",
+            "html"
+        ],
+        "description": "web development",
+        "location": "Tumkur",
+        "apply_link": "https://in.search.yahoo.com/search?fr=mcafee&type=E210IN826G92002&p=chat+gpt"
+    }
+]

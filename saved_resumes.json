@@ -1,0 +1,151 @@
+[
+    {
+        "id": "0d2f1aab-c928-451c-ae40-46e318c39b9d",
+        "email": "makamabhi16@gmail.com",
+        "resume_name": "CK_TK_ Naga Abhishek M N Resume - Classic",
+        "skills": [
+            "python",
+            "Ml",
+            "Data Science",
+            "HTML",
+            "CSS",
+            "JS"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_CK_TK_ Naga Abhishek M N_c6ae4428.pdf",
+        "created_at": "2026-04-01 16:04:10"
+    },
+    {
+        "id": "9aa7ed78-429a-42c7-a191-1024cb29127f",
+        "email": "varungowda0011@gmail.com",
+        "resume_name": "VARUNASIDDESHA H E Resume - Classic",
+        "skills": [
+            "python",
+            "html",
+            "css",
+            "leadership"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_VARUNASIDDESHA H E_54ee3c88.pdf",
+        "created_at": "2026-04-02 11:55:02"
+    },
+    {
+        "id": "986866a0-0ae1-4771-9ba1-e010d38b3278",
+        "email": "chaithrajayanna24@gmail.com",
+        "resume_name": "Chaitra GJ Resume - Elegant",
+        "skills": [
+            "Python",
+            "Java",
+            "C++",
+            "Well Leader ship"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_Chaitra GJ_ea19809a.pdf",
+        "created_at": "2026-04-02 18:47:47"
+    },
+    {
+        "id": "4ecbfbd4-f726-4beb-ad4e-85d98836af4b",
+        "email": "bhavaniprasadjayaram@gmail.com",
+        "resume_name": "Bhavani Prasad GJ Resume - Modern",
+        "skills": [
+            "HTML",
+            "CSS",
+            "JS",
+            "Leadership"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_Bhavani Prasad GJ_084f7d64.pdf",
+        "created_at": "2026-04-02 18:55:53"
+    },
+    {
+        "id": "659ba4cc-b9fe-48a3-854c-46d243f86f9f",
+        "email": "pavankumarpavan15614@gmail.com",
+        "resume_name": "CK_TUM_Pavankumar_BV Resume - Classic",
+        "skills": [
+            "aws",
+            "html",
+            "css",
+            "leadership"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_CK_TUM_Pavankumar_BV_2e0001b8.pdf",
+        "created_at": "2026-04-06 15:03:07"
+    },
+    {
+        "id": "8c3c3576-71a5-4932-85e2-6acc47e5fb31",
+        "email": "pavankumarpavan15614@gmail.com",
+        "resume_name": "Pavankumar  B V Resume - Classic",
+        "skills": [
+            "python",
+            "html",
+            "css",
+            "ml",
+            "leadership"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_Pavankumar  B V_ed7f12f4.pdf",
+        "created_at": "2026-04-08 11:36:32"
+    },
+    {
+        "id": "a87bf7a0-beb9-480e-8be4-6819f11a2a73",
+        "email": "pavankumarpavan15614@gmail.com",
+        "resume_name": "Pavankumar  B V Resume - Modern",
+        "skills": [
+            "python",
+            "html",
+            "css",
+            "ml",
+            "leadership"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_Pavankumar  B V_66f723df.pdf",
+        "created_at": "2026-04-08 11:36:56"
+    },
+    {
+        "id": "5021f851-0691-47a6-bd89-a7bda4691829",
+        "email": "makamabhi16@gmail.com",
+        "resume_name": "ATS Analysis - Naga_Abhishek_M_N_resume.pdf",
+        "skills": [
+            "Java",
+            "Python",
+            "SQL",
+            "Power BI",
+            "Tableau",
+            "Problem-solving",
+            "Team collaboration",
+            "Time management",
+            "Adaptability"
+        ],
+        "ats_score": 85,
+        "file_path": "uploads\\ats_fa98484d-3cd1-4d48-9656-6143edbb1b2f_Naga_Abhishek_M_N_resume.pdf",
+        "created_at": "2026-04-23 16:58:22"
+    },
+    {
+        "id": "b5c00b15-6329-473e-85ea-8d6970ba7a24",
+        "email": "pavankumarpavan15614@gmail.com",
+        "resume_name": "abhishek Resume - Classic",
+        "skills": [
+            "python",
+            "css",
+            "leadership",
+            "communication"
+        ],
+        "ats_score": null,
+        "file_path": "uploads\\gen_resume_abhishek_70a01e19.pdf",
+        "created_at": "2026-05-13 13:32:06"
+    },
+    {
+        "id": "2dd2fd4f-1d2b-4900-879d-b0b03b6f427d",
+        "email": "pavankumarpavan15614@gmail.com",
+        "resume_name": "ATS Analysis - Resume_abhishek_classic_1.pdf",
+        "skills": [
+            "Python",
+            "CSS",
+            "Leadership",
+            "Communication"
+        ],
+        "ats_score": 70,
+        "file_path": "uploads\\ats_515dfb4b-e0c4-44d5-aeac-a8f320f774d5_Resume_abhishek_classic_1.pdf",
+        "created_at": "2026-05-13 13:32:42"
+    }
+]

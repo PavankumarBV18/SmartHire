@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Market Demand Skill Analyzer - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-5xl">
+    <!-- Header -->
+    <div class="text-center mb-16 fade-in">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6">
+            <i class="fas fa-chart-line text-xs"></i> Market Intelligence
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-white font-heading mb-6 tracking-tighter">
+            Skill <span
+                class="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent italic">Demand</span>
+            Pulse
+        </h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed opacity-70">
+            Enter a professional role to uncover the most in-demand technical skills, certifications, and emerging
+            technologies trending in the current market.
+        </p>
+    </div>
+
+    <!-- Search Input Section -->
+    <div class="glass-card p-1 pb-1 flex flex-col items-center mb-16 max-w-3xl mx-auto relative group fade-in"
+        style="animation-delay: 0.1s">
+        <div
+            class="flex flex-col sm:flex-row items-center w-full gap-2 p-3 bg-slate-900/60 rounded-[2rem] border border-slate-800 focus-within:border-indigo-500/50 transition-all shadow-2xl">
+            <div class="flex-1 flex items-center px-4 w-full">
+                <i class="fas fa-search text-slate-500 mr-4"></i>
+                <input type="text" id="roleInput"
+                    class="w-full bg-transparent border-none py-3 text-white text-lg placeholder-slate-600 focus:outline-none focus:ring-0"
+                    placeholder="e.g. Data Scientist, Cloud Architect, Full Stack Developer...">
+            </div>
+            <button onclick="analyzeMarketDemand()" id="analyzeBtn"
+                class="w-full sm:w-auto btn-premium btn-primary py-4 px-10 rounded-2xl text-xs uppercase tracking-[0.2em] font-black group-hover:scale-[1.02] active:scale-[0.98]">
+                Analyze Trends
+            </button>
+        </div>
+
+        <div id="loader"
+            class="hidden absolute -bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-widest">
+            <i class="fas fa-spinner fa-spin"></i> Analyzing Global Market Data...
+        </div>
+    </div>
+
+    <!-- Results Display -->
+    <div id="resultsContainer" class="hidden space-y-12 mb-20">
+        <!-- Market Overview Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 md:col-span-2">
+                <h3
+                    class="text-[10px] items-center gap-2 font-black text-slate-500 uppercase tracking-widest flex mb-6">
+                    <i class="fas fa-binoculars text-blue-400"></i> Market Outlook
+                </h3>
+                <p id="outlookText" class="text-xl md:text-2xl text-slate-200 font-medium leading-relaxed italic"></p>
+            </div>
+            <div class="glass-card p-8 bg-emerald-500/5 border-emerald-500/10">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Estimated Talent Value
+                </h3>
+                <div class="text-3xl font-black text-emerald-400" id="salaryEstimate">N/A</div>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2 leading-none">Global
+                    Median Compensation</p>
+            </div>
+        </div>
+
+        <!-- Skills Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Technical Skills -->
+            <div class="glass-card p-10 overflow-hidden relative">
+                <div class="absolute top-0 right-0 p-8 opacity-5 text-indigo-500"><i
+                        class="fas fa-microchip text-7xl"></i></div>
+                <h3 class="text-xs font-black text-indigo-400 uppercase tracking-[0.3em] mb-8">High-Demand Tech Arsenal
+                </h3>
+                <div id="techSkillsList" class="flex flex-wrap gap-3">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+            <!-- Soft Skills -->
+            <div class="glass-card p-10 overflow-hidden relative">
+                <div class="absolute top-0 right-0 p-8 opacity-5 text-purple-500"><i class="fas fa-brain text-7xl"></i>
+                </div>
+                <h3 class="text-xs font-black text-purple-400 uppercase tracking-[0.3em] mb-8">Strategic Human Capital
+                </h3>
+                <div id="softSkillsList" class="flex flex-wrap gap-3">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Tech & Certifications -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Emerging Tech -->
+            <div class="p-10 glass-card bg-amber-500/5 border-amber-500/10">
+                <h3
+                    class="text-[11px] font-black text-amber-500 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                    <i class="fas fa-rocket"></i> Horizon Technologies
+                </h3>
+                <div id="emergingTechList" class="space-y-4">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+            <!-- Certifications -->
+            <div class="p-10 glass-card bg-blue-500/5 border-blue-500/10">
+                <h3
+                    class="text-[11px] font-black text-blue-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                    <i class="fas fa-award"></i> Premier Certifications
+                </h3>
+                <div id="certsList" class="space-y-4">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .skill-badge {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 1rem;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #e2e8f0;
+        transition: all 0.3s;
+    }
+
+    .skill-badge:hover {
+        border-color: rgba(99, 102, 241, 0.5);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .future-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 1.25rem;
+        font-weight: 600;
+        color: #cbd5e1;
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function analyzeMarketDemand() {
+        const role = document.getElementById('roleInput').value.trim();
+        if (!role) {
+            alert('Please enter a role to analyze.');
+            return;
+        }
+
+        const btn = document.getElementById('analyzeBtn');
+        const loader = document.getElementById('loader');
+        const container = document.getElementById('resultsContainer');
+
+        btn.disabled = true;
+        loader.classList.remove('hidden');
+        container.classList.add('hidden');
+
+        try {
+            const response = await fetch('/market-demand', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: role })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const analysis = data.analysis;
+
+                // Set Outlook
+                document.getElementById('outlookText').textContent = analysis.market_outlook;
+                document.getElementById('salaryEstimate').textContent = analysis.salary_range_estimate || 'N/A';
+
+                // Populate Technical Skills
+                const techList = document.getElementById('techSkillsList');
+                techList.innerHTML = '';
+                analysis.trending_technical_skills.forEach(skill => {
+                    techList.innerHTML += `<div class="skill-badge">${skill}</div>`;
+                });
+
+                // Populate Soft Skills
+                const softList = document.getElementById('softSkillsList');
+                softList.innerHTML = '';
+                analysis.trending_soft_skills.forEach(skill => {
+                    softList.innerHTML += `<div class="skill-badge">${skill}</div>`;
+                });
+
+                // Populate Emerging Tech
+                const emergeList = document.getElementById('emergingTechList');
+                emergeList.innerHTML = '';
+                analysis.emerging_technologies.forEach(tech => {
+                    emergeList.innerHTML += `
+                        <div class="future-item">
+                            <i class="fas fa-circle-plus text-[10px] text-amber-500"></i>
+                            ${tech}
+                        </div>`;
+                });
+
+                // Populate Certifications
+                const certList = document.getElementById('certsList');
+                certList.innerHTML = '';
+                analysis.top_certifications.forEach(cert => {
+                    certList.innerHTML += `
+                        <div class="future-item">
+                            <i class="fas fa-medal text-sm text-blue-500"></i>
+                            ${cert}
+                        </div>`;
+                });
+
+                // Show container with animation
+                container.classList.remove('hidden');
+                container.classList.add('fade-in');
+
+                // Scroll to results
+                setTimeout(() => {
+                    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+
+            } else {
+                alert('Analysis failed: ' + data.error);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('A network error occurred.');
+        } finally {
+            btn.disabled = false;
+            loader.classList.add('hidden');
+        }
+    }
+
+    // Handle Enter key for search
+    document.getElementById('roleInput').addEventListener("keypress", (e) => {
+        if (e.key === "Enter") analyzeMarketDemand();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Verification - SmartHire{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+  </div>
+
+  <div class="max-w-md w-full glass-card p-10 relative z-10 border border-slate-700/50">
+    <div class="mb-8 text-center">
+      <div class="w-16 h-16 bg-slate-800/80 rounded-2xl flex items-center justify-center border border-slate-700/50 mx-auto mb-6 shadow-inner">
+        <i class="fas fa-key text-3xl text-indigo-400"></i>
+      </div>
+      <h2 class="text-3xl font-black text-white font-heading tracking-tight">Step 1</h2>
+      <p class="mt-2 text-sm font-bold text-slate-400 uppercase tracking-widest">Admin Authentication</p>
+    </div>
+    
+    {% if error %}
+    <div class="bg-red-500/10 border border-red-500/20 p-4 mb-6 rounded-xl flex items-start gap-3 fade-in">
+      <i class="fas fa-exclamation-circle text-red-400 mt-0.5"></i>
+      <p class="text-sm text-red-400 font-medium tracking-wide">❌ {{ error }}</p>
+    </div>
+    {% endif %}
+
+    <form class="space-y-6" action="/admin-key-verify" method="POST">
+      <div>
+        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">🔐 Enter Admin Key</label>
+        <div class="flex items-center bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 focus-within:border-indigo-500/50 transition-all">
+          <i class="fas fa-lock text-slate-500 mr-3 text-xs"></i>
+          <input name="admin_key" type="password" required class="bg-transparent border-none focus:outline-none focus:ring-0 py-3.5 text-sm text-white w-full placeholder-slate-600" placeholder="Enter key to proceed">
+        </div>
+      </div>
+
+      <button type="submit" class="w-full btn-premium btn-primary py-4 uppercase text-xs tracking-widest font-black shadow-[0_4px_20px_rgba(79,70,229,0.3)] flex justify-center items-center gap-2 group">
+        Verify Key
+        <i class="fas fa-arrow-right text-[10px] opacity-70 group-hover:translate-x-1 transition-transform"></i>
+      </button>
+      
+      <div class="text-[11px] font-bold text-center mt-6 border-t border-slate-800/60 pt-6 uppercase tracking-wider text-slate-500">
+        <a href="/admin-login" class="text-indigo-400 hover:text-indigo-300 transition-colors">Already registered? Login here</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

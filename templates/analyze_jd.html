@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}JD Intelligence - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-5xl">
+    <!-- Header -->
+    <div class="text-center mb-16 fade-in">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-6 tracking-wider uppercase">
+            <i class="fas fa-bullseye"></i>
+            Precision Matching
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 font-heading">
+            Job Description <span
+                class="bg-gradient-to-r from-emerald-400 to-indigo-400 bg-clip-text text-transparent">Analyzer</span>
+        </h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Unlock hidden requirements and extract critical keywords from any job posting to tailor your resume for
+            maximum impact.
+        </p>
+    </div>
+
+    <div class="max-w-4xl mx-auto fade-in" style="animation-delay: 0.2s">
+        <div class="glass-card gradient-border p-8 md:p-12 relative overflow-hidden group">
+            <!-- Decor -->
+            <div
+                class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700">
+            </div>
+
+            <form id="analyzeJDForm" class="relative z-10">
+                <div class="mb-8">
+                    <label
+                        class="block text-slate-300 font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-widest">
+                        <i class="fas fa-terminal text-indigo-400"></i> Paste Job Description
+                    </label>
+                    <div class="relative group/textarea">
+                        <textarea name="job_description" id="job_description"
+                            class="w-full h-80 p-6 rounded-2xl border border-slate-700 bg-slate-900/50 text-slate-200 placeholder-slate-600 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500/50 focus:outline-none transition-all font-mono text-sm resize-none"
+                            placeholder="Paste the full job description here (Role, Requirements, Qualifications)..."
+                            required></textarea>
+
+                        <!-- Floating indicator -->
+                        <div
+                            class="absolute bottom-4 right-4 text-[10px] text-slate-500 font-mono flex items-center gap-2 px-2 py-1 bg-slate-800 rounded-lg">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span> READY FOR INPUT
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" id="analyzeBtn"
+                        class="w-full btn-premium btn-primary py-4 text-lg shadow-[0_8px_30px_rgba(79,70,229,0.3)] hover:shadow-[0_12px_45px_rgba(79,70,229,0.5)]">
+                        <span id="btnText" class="flex items-center gap-2">
+                            <i class="fas fa-bolt-lightning text-amber-400"></i>
+                            Analyze Professional Requirements
+                        </span>
+                        <span id="loadingText" class="hidden flex items-center gap-2">
+                            <i class="fas fa-cog fa-spin"></i>
+                            AI Engine is processing...
+                        </span>
+                    </button>
+
+                    <p class="text-center text-[10px] text-slate-500 mt-6 uppercase tracking-[0.2em]">
+                        Analysis powered by advanced neural parsing
+                    </p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Tips -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pb-20">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/20 flex flex-col items-center text-center">
+                <div
+                    class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4">
+                    <i class="fas fa-magnifying-glass text-xs"></i>
+                </div>
+                <h3 class="text-sm font-bold text-slate-200 mb-2 font-heading">Skill Extraction</h3>
+                <p class="text-[11px] text-slate-500">Isolate technical and soft skills required for the specific
+                    seniority level.</p>
+            </div>
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/20 flex flex-col items-center text-center">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
+                    <i class="fas fa-key text-xs"></i>
+                </div>
+                <h3 class="text-sm font-bold text-slate-200 mb-2 font-heading">Keyword Mapping</h3>
+                <p class="text-[11px] text-slate-500">Identify standard industry phrases that ATS algorithms prioritize.
+                </p>
+            </div>
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/20 flex flex-col items-center text-center">
+                <div
+                    class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4">
+                    <i class="fas fa-check-to-slot text-xs"></i>
+                </div>
+                <h3 class="text-sm font-bold text-slate-200 mb-2 font-heading">Role Clarity</h3>
+                <p class="text-[11px] text-slate-500">Clarify ambiguous responsibilities into actionable bullet point
+                    highlights.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const form = document.getElementById('analyzeJDForm');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const btnText = document.getElementById('btnText');
+    const loadingText = document.getElementById('loadingText');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const jobDesc = document.getElementById('job_description').value.trim();
+
+        if (!jobDesc) {
+            return;
+        }
+
+        // Loading state
+        analyzeBtn.disabled = true;
+        btnText.classList.add('hidden');
+        loadingText.classList.remove('hidden');
+
+        try {
+            const formData = new FormData();
+            formData.append('job_description', jobDesc);
+
+            const response = await fetch('/analyze-jd', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                alert('Analysis Error: ' + (data.error || 'Server rejected the request'));
+            }
+        } catch (error) {
+            alert('Connection Error: ' + error.message);
+        } finally {
+            analyzeBtn.disabled = false;
+            btnText.classList.remove('hidden');
+            loadingText.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

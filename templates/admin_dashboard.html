@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - SmartHire Command Center{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-7xl">
+  <!-- Header with Actions -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 fade-in">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold mb-4 tracking-wider uppercase">
+        <i class="fas fa-lock"></i> Secured Area
+      </div>
+      <h1 class="text-4xl font-bold text-white font-heading">
+        Command <span class="bg-gradient-to-r from-red-400 to-indigo-400 bg-clip-text text-transparent">Center</span>
+      </h1>
+      <p class="text-slate-400 text-sm mt-1 font-mono uppercase tracking-tighter opacity-80">
+        System Overview • Managing Job Alerts & Notifications
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-4 items-center">
+      <button onclick="document.getElementById('feedback-modal').classList.remove('hidden');" class="btn-premium py-3 px-6 text-xs uppercase tracking-widest font-bold text-indigo-300 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 hover:border-indigo-500/50 transition-all rounded-xl flex items-center shadow-lg hover:shadow-indigo-500/20">
+        <i class="fas fa-comment-dots mr-2"></i> User Feedback
+      </button>
+      <div class="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700/50 shadow-inner">
+        <i class="fas fa-user-shield text-emerald-400"></i>
+        <span class="text-xs text-slate-300 font-bold uppercase tracking-widest">{{ session['user'] }}</span>
+      </div>
+      <a href="/logout" class="btn-premium btn-outline py-3 px-6 text-xs uppercase tracking-widest font-bold text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-all rounded-xl">
+        <i class="fas fa-sign-out-alt mr-2 opacity-50"></i> Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+    <div class="glass-card p-6 border-indigo-500/20 text-center relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center"><i class="fas fa-users text-2xl text-indigo-500/20"></i></div>
+        <div class="text-3xl font-black text-white mb-1">{{ total_users|default(0) }}</div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Users</div>
+    </div>
+    <div class="glass-card p-6 border-amber-500/20 text-center relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center"><i class="fas fa-crown text-2xl text-amber-500/20"></i></div>
+        <div class="text-3xl font-black text-amber-400 mb-1">{{ premium_users|default(0) }}</div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Premium Users</div>
+    </div>
+    <div class="glass-card p-6 border-emerald-500/20 text-center relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center"><i class="fas fa-briefcase text-2xl text-emerald-500/20"></i></div>
+        <div class="text-3xl font-black text-emerald-400 mb-1">{{ jobs|length }}</div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Jobs Posted</div>
+    </div>
+    <div class="glass-card p-6 border-blue-500/20 text-center relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center"><i class="fas fa-paper-plane text-2xl text-blue-500/20"></i></div>
+        <div class="text-3xl font-black text-blue-400 mb-1">{{ total_alerts|default(0) }}</div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Email Alerts Sent</div>
+    </div>
+    <div class="glass-card p-6 border-purple-500/20 text-center relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center"><i class="fas fa-file-alt text-2xl text-purple-500/20"></i></div>
+        <div class="text-3xl font-black text-purple-400 mb-1">{{ total_resumes|default(0) }}</div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Resumes Uploaded</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- LEFT COLUMN: Job Creation Form -->
+    <div class="lg:col-span-1 fade-in mt-2" style="animation-delay: 0.1s;">
+      <div class="glass-card p-8 border-indigo-500/10 h-full relative overflow-hidden group">
+        <!-- Glow accent -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"></div>
+
+        <h3 class="text-xl font-bold text-white mb-6 font-heading flex items-center gap-3">
+          {% if edit_job %}
+          <i class="fas fa-edit text-indigo-400"></i> Edit Job Alert
+          {% else %}
+          <i class="fas fa-paper-plane text-indigo-400"></i> Dispatch Job Alert
+          {% endif %}
+        </h3>
+        
+        <form action="{% if edit_job %}/edit-job/{{ edit_index }}{% else %}/add-job{% endif %}" method="POST" class="space-y-4 relative z-10">
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Job Title</label>
+            <div class="flex items-center bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 focus-within:border-indigo-500/50 transition-all">
+                <i class="fas fa-briefcase text-slate-500 mr-3 text-xs"></i>
+                <input type="text" name="title" required value="{{ edit_job.title if edit_job else '' }}" class="bg-transparent border-none focus:outline-none focus:ring-0 py-3 text-sm text-white w-full placeholder-slate-600" placeholder="e.g. Senior Backend Engineer">
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Company</label>
+            <div class="flex items-center bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 focus-within:border-indigo-500/50 transition-all">
+                <i class="fas fa-building text-slate-500 mr-3 text-xs"></i>
+                <input type="text" name="company" required value="{{ edit_job.company if edit_job else '' }}" class="bg-transparent border-none focus:outline-none focus:ring-0 py-3 text-sm text-white w-full placeholder-slate-600" placeholder="e.g. Acme Corp">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Location</label>
+            <div class="flex items-center bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 focus-within:border-indigo-500/50 transition-all">
+                <i class="fas fa-map-marker-alt text-slate-500 mr-3 text-xs"></i>
+                <input type="text" name="location" value="{{ edit_job.location if edit_job else '' }}" class="bg-transparent border-none focus:outline-none focus:ring-0 py-3 text-sm text-white w-full placeholder-slate-600" placeholder="e.g. Remote, NY">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Required Skills (Comma-Separated)</label>
+            <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 pt-3 pb-2 focus-within:border-indigo-500/50 transition-all">
+                <textarea name="skills" required rows="2" class="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-sm text-white placeholder-slate-600 resize-none" placeholder="Python, Django, AWS, SQL">{{ edit_job.skills|join(', ') if edit_job else '' }}</textarea>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Job Description</label>
+            <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 pt-3 pb-2 focus-within:border-indigo-500/50 transition-all">
+                <textarea name="description" rows="3" class="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-sm text-white placeholder-slate-600 scrollbar-thin resize-none" placeholder="Brief details about the role...">{{ edit_job.description if edit_job else '' }}</textarea>
+            </div>
+          </div>
+
+          <div>
+             <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Apply Link</label>
+             <div class="flex items-center bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 focus-within:border-indigo-500/50 transition-all">
+                 <i class="fas fa-link text-slate-500 mr-3 text-xs"></i>
+                 <input type="url" name="apply_link" value="{{ edit_job.apply_link if edit_job else '' }}" class="bg-transparent border-none focus:outline-none focus:ring-0 py-3 text-sm text-white w-full placeholder-slate-600" placeholder="https://careers.acme.com/apply">
+             </div>
+          </div>
+
+          <button type="submit" class="w-full btn-premium btn-primary py-4 mt-6 uppercase text-xs tracking-widest font-black shadow-[0_4px_20px_rgba(79,70,229,0.3)]">
+            {% if edit_job %}
+              Update Active Alert <i class="fas fa-check ml-2"></i>
+            {% else %}
+              Create & Broadcast Alert <i class="fas fa-arrow-right ml-2"></i>
+            {% endif %}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Sent Alerts -->
+    <div class="lg:col-span-2 space-y-6 fade-in mt-2" style="animation-delay: 0.2s;">
+      
+      <div class="flex items-center justify-between mb-2 px-1">
+        <h3 class="text-xl font-bold text-white font-heading">Active Dispatches</h3>
+        <span class="text-xs font-bold bg-slate-800 px-3 py-1 rounded-full text-slate-400 border border-slate-700">{{ jobs|length }} Total</span>
+      </div>
+
+      {% if enumerated_jobs %}
+        {% for index, job in enumerated_jobs|reverse %}
+          <!-- Job Card -->
+          <div class="glass-card p-6 border-slate-700/30 hover:border-slate-500/30 transition-all group">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="text-lg font-bold text-white flex items-center gap-2">
+                    {{ job.title }} 
+                    <span class="text-[9px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-widest">Active</span>
+                </h4>
+                <div class="flex items-center gap-4 text-xs font-bold text-slate-400 mt-2 tracking-wide uppercase">
+                  <span><i class="fas fa-building mr-1 opacity-70"></i> {{ job.company }}</span>
+                  <span class="w-1 h-1 rounded-full bg-slate-600"></span>
+                  <span><i class="fas fa-map-marker-alt mr-1 opacity-70"></i> {{ job.location|default('Unspecified') }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                  <a href="/edit-job/{{ index }}" class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-indigo-400 hover:text-white hover:border-indigo-500 hover:bg-indigo-500/20 transition-all" title="Edit Job">
+                    <i class="fas fa-edit text-xs"></i>
+                  </a>
+                  <form action="/delete-job/{{ index }}" method="POST" onsubmit="return confirm('Delete this job dispatch permanentely?');">
+                      <button type="submit" class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-red-400 hover:text-white hover:border-red-500 hover:bg-red-500/20 transition-all" title="Delete Job">
+                        <i class="fas fa-trash text-xs"></i>
+                      </button>
+                  </form>
+                  <a href="{{ job.apply_link|default('#') }}" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-500 transition-all" title="Apply Link">
+                    <i class="fas fa-external-link-alt text-xs"></i>
+                  </a>
+              </div>
+            </div>
+
+            <p class="mt-4 text-sm text-slate-300 leading-relaxed max-w-2xl line-clamp-2">
+              {{ job.description|default('No description provided.') }}
+            </p>
+
+            <div class="mt-5 pt-5 border-t border-slate-800">
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Matched Skills Radar</span>
+                <div class="flex flex-wrap gap-2">
+                    {% for skill in job.skills %}
+                    <span class="px-2.5 py-1 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-[10px] font-bold">
+                        {{ skill }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <!-- Empty State -->
+        <div class="glass-card p-12 border-slate-700/30 text-center flex flex-col items-center justify-center h-[500px]">
+          <div class="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-inbox text-3xl text-slate-500"></i>
+          </div>
+          <h4 class="text-xl font-bold text-white mb-2 font-heading">No Active Alerts</h4>
+          <p class="text-slate-400 text-sm max-w-sm">You haven't dispatched any job alerts yet. Use the command form on the left to broadcast to your candidates.</p>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Analytics & User Management -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8 fade-in" style="animation-delay: 0.3s;">
+    <!-- User Distribution Chart -->
+    <div class="lg:col-span-1 glass-card p-8 border-indigo-500/10">
+      <h3 class="text-xl font-bold text-white mb-6 font-heading flex items-center gap-3">
+        <i class="fas fa-chart-pie text-indigo-400"></i> User Distribution
+      </h3>
+      <div class="h-64">
+        <canvas id="userDistChart"></canvas>
+      </div>
+      <div class="mt-6 space-y-3">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-400 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-600"></span> Free Users</span>
+          <span class="text-white font-bold">{{ total_users - premium_users }}</span>
+        </div>
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-400 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-indigo-500"></span> Premium Users</span>
+          <span class="text-white font-bold">{{ premium_users }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Resume History -->
+    <div class="lg:col-span-2 glass-card p-8 border-slate-700/30">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-white font-heading"><i class="fas fa-folder-open text-indigo-400 mr-2"></i> System Resume History</h3>
+        <span class="text-xs font-bold bg-slate-800 px-3 py-1 rounded-full text-slate-400 border border-slate-700">{{ history|length }} Resumes Logged</span>
+      </div>
+      
+      {% if history %}
+      <div class="overflow-y-auto max-h-[400px] scrollbar-thin">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="text-xs text-slate-500 uppercase bg-slate-800/50 sticky top-0 z-10">
+            <tr>
+              <th scope="col" class="px-6 py-4 font-black tracking-widest">Candidate</th>
+              <th scope="col" class="px-6 py-4 font-black tracking-widest">Resume</th>
+              <th scope="col" class="px-6 py-4 font-black tracking-widest">Date</th>
+              <th scope="col" class="px-6 py-4 font-black tracking-widest text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in history %}
+            <tr class="border-b border-slate-700/30 hover:bg-slate-800/20 transition-colors">
+              <td class="px-6 py-4 font-medium text-white max-w-[150px] truncate">{{ item.email }}</td>
+              <td class="px-6 py-4 max-w-[150px] truncate">{{ item.resume_name }}</td>
+              <td class="px-6 py-4 text-[10px] font-mono text-slate-400">{{ item.created_at[:10] }}</td>
+              <td class="px-6 py-4 text-right">
+                <a href="/view-resume/{{ item.id }}" target="_blank" class="text-indigo-400 hover:text-indigo-300 mx-1" title="View PDF"><i class="fas fa-eye"></i></a>
+                <a href="/download-resume/{{ item.id }}" class="text-emerald-400 hover:text-emerald-300 mx-1" title="Download"><i class="fas fa-download"></i></a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <i class="fas fa-file-pdf text-3xl text-slate-600 mb-3"></i>
+        <p class="text-slate-400">No resumes logged yet.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('userDistChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Free Users', 'Premium Users'],
+                datasets: [{
+                    data: [{{ total_users - premium_users }}, {{ premium_users }}],
+                    backgroundColor: ['#475569', '#6366f1'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    });
+  </script>
+
+</div>
+
+<!-- Feedback Modal Overlay -->
+<div id="feedback-modal" class="fixed inset-0 z-[100] hidden">
+    <!-- Backdrop --><!-- Backdrop -->
+    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="document.getElementById('feedback-modal').classList.add('hidden');"></div>
+    
+    <!-- Modal Window -->
+    <div class="absolute inset-x-0 bottom-0 md:top-1/2 md:-translate-y-1/2 md:max-w-4xl mx-auto bg-slate-900 border-t md:border border-slate-700/50 rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden h-[80vh] md:h-auto md:max-h-[80vh] flex flex-col fade-in">
+        <!-- Header -->
+        <div class="px-8 py-6 border-b border-slate-800 flex justify-between items-center bg-slate-800/20">
+            <div>
+                <h3 class="text-2xl font-bold text-white font-heading flex items-center gap-3">
+                    <i class="fas fa-satellite-dish text-indigo-400"></i> Ecosystem Feedback
+                </h3>
+                <p class="text-slate-400 text-xs tracking-widest uppercase font-bold mt-1">{{ feedback|length }} Data Points Logged</p>
+            </div>
+            <button onclick="document.getElementById('feedback-modal').classList.add('hidden');" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all relative z-10 cursor-pointer border border-transparent hover:border-slate-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Feedback Content List -->
+        <div class="p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-500/30 scrollbar-track-transparent flex-1 space-y-4">
+            {% if feedback %}
+                {% for item in feedback|reverse %}
+                <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/30 hover:border-indigo-500/30 transition-all">
+                    <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-900 border border-slate-800 px-3 py-1 rounded-full"><i class="fas fa-clock mr-1 text-indigo-500 opacity-50"></i> {{ item.formatted_time }}</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">Origin: {{ item.page }}</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            {% for i in range(1, 6) %}
+                                <i class="fas fa-star {% if i <= item.rating|int %}text-yellow-400{% else %}text-slate-700{% endif %}"></i>
+                            {% endfor %}
+                            <span class="text-xs font-bold text-slate-500 ml-2">({{ item.rating }}/5)</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/50 shadow-inner">
+                        <p class="text-sm text-slate-300 leading-relaxed italic">
+                            {% if item.comment %}
+                                "{{ item.comment }}"
+                            {% else %}
+                                <span class="opacity-30">No additional contextual commentary provided by user.</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-wind text-3xl text-slate-500"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-2 font-heading">No Telemetry Yet</h4>
+                    <p class="text-slate-400 text-sm max-w-sm mx-auto">The ecosystem has not recorded any candidate feedback yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

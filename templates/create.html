@@ -1,0 +1,684 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Resume - SmartHire{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-card.active .card-container {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+        transform: translateY(-5px);
+    }
+
+    .template-card.active .selected-overlay {
+        opacity: 1 !important;
+    }
+
+    .template-card.active .check-icon {
+        transform: scale(1) !important;
+    }
+
+    .template-card:hover .card-container {
+        transform: translateY(-3px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-5xl">
+    <!-- Navigation Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 fade-in">
+        <div>
+            <a href="/"
+                class="group inline-flex items-center gap-2 text-slate-400 hover:text-white transition-all text-sm font-medium mb-4">
+                <div
+                    class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
+                    <i class="fas fa-arrow-left text-[10px]"></i>
+                </div>
+                Exit to Dashboard
+            </a>
+            <h1 class="text-4xl font-bold text-white font-heading">
+                Resume <span
+                    class="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Architect</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Structure your future, one section at a time.</p>
+        </div>
+
+        <div class="hidden md:flex items-center gap-4 p-2 bg-slate-900/50 border border-slate-800 rounded-2xl">
+            <div class="flex flex-col items-center px-4 border-r border-slate-800">
+                <span class="text-xs text-slate-500 font-bold uppercase tracking-widest">Progress</span>
+                <span class="text-white font-bold">New Draft</span>
+            </div>
+            <div class="px-4 border-r border-slate-800">
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-slate-500 font-bold uppercase tracking-widest">Selected Style</span>
+                    <span id="headerTemplateDisplay"
+                        class="text-indigo-400 font-bold text-[10px] uppercase tracking-wider">Executive Classic</span>
+                </div>
+            </div>
+            <div class="px-4">
+                <button type="submit" form="createForm"
+                    class="btn-premium btn-primary py-2 px-6 text-xs uppercase tracking-widest">
+                    Save & Build
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <form action="/create" method="POST" class="space-y-10 pb-20 fade-in" id="createForm" style="animation-delay: 0.1s">
+        <!-- Hidden Template Input -->
+        <input type="hidden" name="template" id="selectedTemplate" value="classic">
+
+        <!-- Template Selection Grid -->
+        <div class="glass-card p-8 mb-10 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-500"></div>
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-layer-group text-sm"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white font-heading">Design Selection</h2>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Choose a visual
+                        framework for your professional story</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Executive Classic -->
+                <div class="template-card group/card cursor-pointer"
+                    onclick="selectTemplate('classic', 'Executive Classic', this)" id="tpl-classic">
+                    <div
+                        class="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-800 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] card-container">
+                        <img src="/static/templates/executive_classic.png" alt="Executive Classic"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover/card:opacity-40 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover/card:translate-y-[-8px]">
+                            <p class="text-[10px] font-bold text-white uppercase tracking-widest">Executive Classic</p>
+                            <p
+                                class="text-[8px] text-slate-400 mt-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                                Conservative & high-impact traditional layout.</p>
+                        </div>
+                        <div
+                            class="selected-overlay absolute inset-0 flex items-center justify-center bg-indigo-600/20 backdrop-blur-[2px] opacity-0 transition-all duration-300">
+                            <div
+                                class="check-icon w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Silicon Valley Modern -->
+                <div class="template-card group/card cursor-pointer"
+                    onclick="selectTemplate('modern', 'Silicon Valley Modern', this)" id="tpl-modern">
+                    <div
+                        class="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-800 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] card-container">
+                        <img src="/static/templates/silicon_valley.png" alt="Silicon Valley Modern"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover/card:opacity-40 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover/card:translate-y-[-8px]">
+                            <p class="text-[10px] font-bold text-white uppercase tracking-widest">Silicon Valley Modern
+                            </p>
+                            <p
+                                class="text-[8px] text-slate-400 mt-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                                Tech-forward, minimalist, and sidebar-driven.</p>
+                        </div>
+                        <div
+                            class="selected-overlay absolute inset-0 flex items-center justify-center bg-indigo-600/20 backdrop-blur-[2px] opacity-0 transition-all duration-300">
+                            <div
+                                class="check-icon w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Artistic Visionary -->
+                <div class="template-card group/card cursor-pointer"
+                    onclick="selectTemplate('creative', 'Artistic Visionary', this)" id="tpl-creative">
+                    <div
+                        class="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-800 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] card-container">
+                        <img src="/static/templates/artistic_visionary.png" alt="Artistic Visionary"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover/card:opacity-40 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover/card:translate-y-[-8px]">
+                            <p class="text-[10px] font-bold text-white uppercase tracking-widest">Artistic Visionary</p>
+                            <p
+                                class="text-[8px] text-slate-400 mt-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                                Fluid, creative font-centric masterpiece.</p>
+                        </div>
+                        <div
+                            class="selected-overlay absolute inset-0 flex items-center justify-center bg-indigo-600/20 backdrop-blur-[2px] opacity-0 transition-all duration-300">
+                            <div
+                                class="check-icon w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Corporate Professional -->
+                <div class="template-card group/card cursor-pointer"
+                    onclick="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}selectTemplate('zety', 'Corporate Professional', this){% else %}showPremiumModal(){% endif %}" id="tpl-zety">
+                    <div
+                        class="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-800 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] card-container">
+                        {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+                        <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-black uppercase tracking-widest rounded z-10 flex items-center gap-1 shadow-lg">
+                            <i class="fas fa-crown"></i> PRO
+                        </div>
+                        {% endif %}
+                        <img src="/static/templates/corporate_professional.png" alt="Corporate Professional"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover/card:opacity-40 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover/card:translate-y-[-8px]">
+                            <p class="text-[10px] font-bold text-white uppercase tracking-widest">Corporate Professional
+                            </p>
+                            <p
+                                class="text-[8px] text-slate-400 mt-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                                Rugged, dual-column corporate structure.</p>
+                        </div>
+                        <div
+                            class="selected-overlay absolute inset-0 flex items-center justify-center bg-indigo-600/20 backdrop-blur-[2px] opacity-0 transition-all duration-300">
+                            <div
+                                class="check-icon w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bold Impact -->
+                <div class="template-card group/card cursor-pointer"
+                    onclick="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}selectTemplate('harrison', 'Bold Impact', this){% else %}showPremiumModal(){% endif %}" id="tpl-harrison">
+                    <div
+                        class="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-800 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] card-container">
+                        {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+                        <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-black uppercase tracking-widest rounded z-10 flex items-center gap-1 shadow-lg">
+                            <i class="fas fa-crown"></i> PRO
+                        </div>
+                        {% endif %}
+                        <img src="/static/templates/bold_impact.png" alt="Bold Impact"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover/card:opacity-40 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover/card:translate-y-[-8px]">
+                            <p class="text-[10px] font-bold text-white uppercase tracking-widest">Bold Impact</p>
+                            <p
+                                class="text-[8px] text-slate-400 mt-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                                Strong colors & typography for leadership.</p>
+                        </div>
+                        <div
+                            class="selected-overlay absolute inset-0 flex items-center justify-center bg-indigo-600/20 backdrop-blur-[2px] opacity-0 transition-all duration-300">
+                            <div
+                                class="check-icon w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Minimalist Elegant -->
+                <div class="template-card group/card cursor-pointer"
+                    onclick="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}selectTemplate('elegant', 'Minimalist Elegant', this){% else %}showPremiumModal(){% endif %}" id="tpl-elegant">
+                    <div
+                        class="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-800 transition-all duration-300 hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] card-container">
+                        {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+                        <div class="absolute top-2 right-2 px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-black uppercase tracking-widest rounded z-10 flex items-center gap-1 shadow-lg">
+                            <i class="fas fa-crown"></i> PRO
+                        </div>
+                        {% endif %}
+                        <img src="/static/templates/minimalist_elegant.png" alt="Minimalist Elegant"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover/card:opacity-40 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover/card:translate-y-[-8px]">
+                            <p class="text-[10px] font-bold text-white uppercase tracking-widest">Minimalist Elegant</p>
+                            <p
+                                class="text-[8px] text-slate-400 mt-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                                Sleek, monochrome, and sophisticatedly simple.</p>
+                        </div>
+                        <div
+                            class="selected-overlay absolute inset-0 flex items-center justify-center bg-indigo-600/20 backdrop-blur-[2px] opacity-0 transition-all duration-300">
+                            <div
+                                class="check-icon w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Personal Information -->
+        <div class="glass-card p-8 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-amber-500/50"></div>
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-user-tie text-sm"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white font-heading">Contact Details</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Full
+                        Name</label>
+                    <input type="text" name="name" required placeholder="Johnathan Doe"
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-400/50 focus:ring-4 focus:ring-amber-400/5 transition-all outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Professional
+                        Email</label>
+                    <input type="email" name="email" required placeholder="john.doe@example.com"
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-400/50 focus:ring-4 focus:ring-amber-400/5 transition-all outline-none">
+                </div>
+                <div class="space-y-2 relative">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Phone
+                        Number</label>
+                    <input type="tel" name="phone" id="phone_input" placeholder="+91 9876543210" required
+                        pattern="^(?:\+91\s?)?[6789]\d{9}$"
+                        title="Please enter a valid Indian phone number (e.g., 9876543210 or +91 9876543210)"
+                        class="peer w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-400/50 focus:ring-4 focus:ring-amber-400/5 transition-all outline-none invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-500 invalid:[&:not(:placeholder-shown):not(:focus)]:text-red-400">
+                    <p class="mt-1 text-xs text-red-500 opacity-0 peer-invalid:[&:not(:placeholder-shown):not(:focus)]:opacity-100 transition-opacity">
+                        Must be a valid 10-digit Indian number.
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Professional
+                        Links</label>
+                    <input type="text" name="links" placeholder="LinkedIn, Portfolio, GitHub..."
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-400/50 focus:ring-4 focus:ring-amber-400/5 transition-all outline-none">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Professional Summary -->
+        <div class="glass-card p-8 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500/50"></div>
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-quote-left text-sm"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white font-heading">Professional Narrative</h2>
+                </div>
+                <button type="button" onclick="generateAISummary()" id="genSummaryBtn"
+                    class="btn-premium border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 py-1.5 px-4 text-[10px] uppercase font-black tracking-widest">
+                    <i class="fas fa-wand-magic-sparkles mr-2 opacity-60"></i> AI Auto-Generate
+                </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-4 uppercase tracking-wider font-bold">Write 3-4 sentences
+                summarizing your key expertise.</p>
+            <div class="relative group">
+                <textarea name="summary" id="summaryText" rows="4"
+                    class="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-6 py-4 text-white focus:border-indigo-400/50 focus:ring-4 focus:ring-indigo-400/5 transition-all outline-none font-sans leading-relaxed text-sm resize-none"
+                    placeholder="A results-driven professional with 10+ years of experience in..."></textarea>
+                <div id="summaryLoader"
+                    class="hidden absolute inset-0 bg-slate-900/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                    <div class="flex items-center gap-3 text-indigo-400 text-xs font-bold animate-pulse">
+                        <i class="fas fa-sparkles"></i> AI is drafting your story...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Experience -->
+        <div class="glass-card p-8 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500/50"></div>
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-briefcase text-sm"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white font-heading">Work Experience</h2>
+                </div>
+                <button type="button" onclick="addExperience()"
+                    class="btn-premium border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 py-1.5 px-4 text-xs">
+                    <i class="fas fa-plus-circle mr-2 opacity-50"></i> Add Role
+                </button>
+            </div>
+            <div id="experience-container" class="space-y-6">
+                <!-- Dynamic Injection -->
+            </div>
+        </div>
+
+        <!-- Section: Education -->
+        <div class="glass-card p-8 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500/50"></div>
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-sm"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white font-heading">Education & Certs</h2>
+                </div>
+                <button type="button" onclick="addEducation()"
+                    class="btn-premium border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 py-1.5 px-4 text-xs">
+                    <i class="fas fa-plus-circle mr-2 opacity-50"></i> Add Degree
+                </button>
+            </div>
+            <div id="education-container" class="space-y-6">
+                <!-- Dynamic Injection -->
+            </div>
+        </div>
+
+        <!-- Section: Skills -->
+        <div class="glass-card p-8 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-purple-500/50"></div>
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-bolt text-sm"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white font-heading">Skill Inventory</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Technical
+                        Arsenal (Comma separated)</label>
+                    <textarea name="technical_skills" rows="3"
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-6 py-4 text-white focus:border-purple-400/50 focus:ring-4 focus:ring-purple-400/5 outline-none text-sm resize-none"
+                        placeholder="Python, AWS, Terraform, Kubernetes, React..."></textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Core
+                        Competencies (Comma separated)</label>
+                    <textarea name="soft_skills" rows="3"
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-6 py-4 text-white focus:border-purple-400/50 focus:ring-4 focus:ring-purple-400/5 outline-none text-sm resize-none"
+                        placeholder="Agile Leadership, Stakeholder Management..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Projects -->
+        <div class="glass-card p-8 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500/50"></div>
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-diagram-project text-sm"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white font-heading">Key Projects</h2>
+                </div>
+                <button type="button" onclick="addProject()"
+                    class="btn-premium border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 py-1.5 px-4 text-xs">
+                    <i class="fas fa-plus-circle mr-2 opacity-50"></i> Add Project
+                </button>
+            </div>
+            <div id="projects-container" class="space-y-6">
+                <!-- Dynamic Injection -->
+            </div>
+        </div>
+
+        <!-- Section: Additional Details -->
+        <div class="glass-card p-8 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full bg-teal-500/50"></div>
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 bg-teal-500/10 text-teal-400 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-medal text-sm"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white font-heading">Additional Highlights</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Certifications (One per line)</label>
+                    <textarea name="certifications" rows="3"
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-6 py-4 text-white focus:border-teal-400/50 focus:ring-4 focus:ring-teal-400/5 outline-none text-sm resize-none"
+                        placeholder="AWS Certified Solutions Architect&#10;Google Data Analytics Professional"></textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Achievements (One per line)</label>
+                    <textarea name="achievements" rows="3"
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-6 py-4 text-white focus:border-teal-400/50 focus:ring-4 focus:ring-teal-400/5 outline-none text-sm resize-none"
+                        placeholder="Employee of the Year 2023&#10;1st Place, National Hackathon"></textarea>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Languages Known (Comma separated)</label>
+                    <input type="text" name="languages" placeholder="English, Spanish, French..."
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-teal-400/50 focus:ring-4 focus:ring-teal-400/5 outline-none text-sm">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Hobbies & Interests (Comma separated)</label>
+                    <input type="text" name="hobbies" placeholder="Photography, Open Source Contributing, Chess..."
+                        class="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-teal-400/50 focus:ring-4 focus:ring-teal-400/5 outline-none text-sm">
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center pt-10">
+            <button type="submit"
+                class="btn-premium btn-primary py-5 px-16 text-xl shadow-[0_10px_40px_rgba(99,102,241,0.3)]">
+                <i class="fas fa-wand-magic-sparkles mr-3 opacity-60"></i>
+                Architect My Resume
+            </button>
+            <p class="text-[10px] text-slate-500 mt-6 uppercase tracking-[0.4em] font-bold">Standard Professional Format
+                • ATS Optimized • Global Compatibility</p>
+        </div>
+    </form>
+</div>
+
+<!-- Templates for Dynamic Rows -->
+<template id="experience-template">
+    <div
+        class="experience-item bg-slate-800/20 p-6 rounded-2xl border border-slate-700/50 relative group/item hover:border-emerald-500/30 transition-all">
+        <button type="button" onclick="this.parentElement.remove()"
+            class="absolute top-4 right-4 text-slate-600 hover:text-red-400 transition-colors">
+            <i class="fas fa-trash-can text-sm"></i>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Job Title</label>
+                <input type="text" name="exp_title[]" required
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-emerald-400/40 outline-none">
+            </div>
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Company
+                    Organization</label>
+                <input type="text" name="exp_company[]" required
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-emerald-400/40 outline-none">
+            </div>
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Duration (Jan 20XX -
+                    Present)</label>
+                <input type="text" name="exp_dates[]" required
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-emerald-400/40 outline-none">
+            </div>
+        </div>
+        <div class="space-y-1">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Key Accomplishments (One
+                per line)</label>
+            <textarea name="exp_desc[]" rows="3"
+                class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-emerald-400/40 outline-none resize-none font-sans"
+                placeholder="• Redesigned the core API, improving latency by 30%..."></textarea>
+        </div>
+    </div>
+</template>
+
+<template id="education-template">
+    <div
+        class="education-item bg-slate-800/20 p-6 rounded-2xl border border-slate-700/50 relative group/item hover:border-blue-500/30 transition-all">
+        <button type="button" onclick="this.parentElement.remove()"
+            class="absolute top-4 right-4 text-slate-600 hover:text-red-400 transition-colors">
+            <i class="fas fa-trash-can text-sm"></i>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Degree
+                    Program</label>
+                <input type="text" name="edu_degree[]" required
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-blue-400/40 outline-none">
+            </div>
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Institution
+                    Name</label>
+                <input type="text" name="edu_school[]" required
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-blue-400/40 outline-none">
+            </div>
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Year of
+                    Completion</label>
+                <input type="text" name="edu_dates[]" required
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-blue-400/40 outline-none">
+            </div>
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">CGPA / Percentage</label>
+                <input type="text" name="edu_cgpa[]" placeholder="e.g. 3.8/4.0 or 85%"
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-blue-400/40 outline-none">
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="project-template">
+    <div
+        class="project-item bg-slate-800/20 p-6 rounded-2xl border border-slate-700/50 relative group/item hover:border-rose-500/30 transition-all">
+        <button type="button" onclick="this.parentElement.remove()"
+            class="absolute top-4 right-4 text-slate-600 hover:text-red-400 transition-colors">
+            <i class="fas fa-trash-can text-sm"></i>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Project
+                    Headline</label>
+                <input type="text" name="proj_name[]" required
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-rose-400/40 outline-none">
+            </div>
+            <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tech Stack
+                    used</label>
+                <input type="text" name="proj_tech[]"
+                    class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-rose-400/40 outline-none">
+            </div>
+        </div>
+        <div class="space-y-1">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Core Impact /
+                Summary</label>
+            <textarea name="proj_desc[]" rows="2"
+                class="w-full bg-slate-900/40 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:border-rose-400/40 outline-none resize-none font-sans"></textarea>
+        </div>
+    </div>
+</template>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function addExperience() {
+        const tpl = document.getElementById('experience-template');
+        const container = document.getElementById('experience-container');
+        const clone = tpl.content.cloneNode(true);
+        container.appendChild(clone);
+    }
+
+    function addEducation() {
+        const tpl = document.getElementById('education-template');
+        const container = document.getElementById('education-container');
+        const clone = tpl.content.cloneNode(true);
+        container.appendChild(clone);
+    }
+
+    function addProject() {
+        const tpl = document.getElementById('project-template');
+        const container = document.getElementById('projects-container');
+        const clone = tpl.content.cloneNode(true);
+        container.appendChild(clone);
+    }
+
+    async function generateAISummary() {
+        const skills = document.querySelector('[name="technical_skills"]').value + ', ' + document.querySelector('[name="soft_skills"]').value;
+        const expTitles = Array.from(document.querySelectorAll('[name="exp_title[]"]')).map(el => el.value).join(', ');
+
+        if (!skills.trim() && !expTitles.trim()) {
+            alert('Please fill in some skills or work experience first so AI has context!');
+            return;
+        }
+
+        const btn = document.getElementById('genSummaryBtn');
+        const loader = document.getElementById('summaryLoader');
+        const textarea = document.getElementById('summaryText');
+
+        btn.disabled = true;
+        loader.classList.remove('hidden');
+
+        try {
+            const response = await fetch('/generate-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ skills, experience: expTitles })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                textarea.value = data.summary;
+            } else {
+                alert('Generation failed: ' + data.error);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('A network error occurred.');
+        } finally {
+            btn.disabled = false;
+            loader.classList.add('hidden');
+        }
+    }
+
+    function selectTemplate(id, name, element) {
+        // Update Hidden Input
+        document.getElementById('selectedTemplate').value = id;
+
+        // Update Header Display
+        const headerDisplay = document.getElementById('headerTemplateDisplay');
+        if (headerDisplay) {
+            headerDisplay.textContent = name;
+        }
+
+        // Update UI Selection
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        element.classList.add('active');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        addExperience();
+        addEducation();
+
+        // Set default selection
+        const defaultCard = document.getElementById('tpl-classic');
+        if (defaultCard) {
+            selectTemplate('classic', 'Executive Classic', defaultCard);
+        }
+
+        // Add client-side validation logic
+        const form = document.getElementById('createForm');
+        form.addEventListener('submit', function(event) {
+            const phoneInput = document.getElementById('phone_input');
+            const pattern = new RegExp(phoneInput.pattern);
+            if (!pattern.test(phoneInput.value.trim())) {
+                event.preventDefault();
+                phoneInput.classList.add('border-red-500');
+                alert('Please enter a valid Indian contact number.\nValid examples: 9876543210, +91 9876543210');
+                phoneInput.focus();
+            }
+        });
+    });
+</script>
+{% endblock %}

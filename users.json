@@ -1,0 +1,133 @@
+[
+    {
+        "email": "makamabhi16@gmail.com",
+        "skills": [
+            "Problem-solving",
+            "SQL",
+            "Time management",
+            "Java",
+            "python",
+            "CSS",
+            "HTML",
+            "Team collaboration",
+            "Python",
+            "JS",
+            "Adaptability",
+            "Ml",
+            "Tableau",
+            "Data Science",
+            "Power BI"
+        ],
+        "full_name": "makamabhi16",
+        "password": "DiSK2tnZW4E!rBL",
+        "phone": "",
+        "education": "",
+        "role": "user",
+        "plan": "free"
+    },
+    {
+        "email": "varungowda0011@gmail.com",
+        "skills": [
+            "leadership",
+            "html",
+            "python sql power bi",
+            "google data analyst certification",
+            "python sql power bi css html",
+            "css",
+            "python"
+        ],
+        "full_name": "varungowda0011",
+        "password": "password123",
+        "phone": "",
+        "education": "",
+        "role": "user",
+        "plan": "free"
+    },
+    {
+        "email": "chaithrajayanna24@gmail.com",
+        "skills": [
+            "Java",
+            "C++",
+            "Python",
+            "Well Leader ship"
+        ],
+        "full_name": "chaithrajayanna24",
+        "password": "password123",
+        "phone": "",
+        "education": "",
+        "role": "user",
+        "plan": "free"
+    },
+    {
+        "email": "bhavaniprasadjayaram@gmail.com",
+        "skills": [
+            "HTML",
+            "CSS",
+            "JS",
+            "Leadership"
+        ],
+        "full_name": "bhavaniprasadjayaram",
+        "password": "password123",
+        "phone": "",
+        "education": "",
+        "role": "user",
+        "plan": "free"
+    },
+    {
+        "email": "hr@gmail.com",
+        "skills": [],
+        "full_name": "hr",
+        "password": "12345",
+        "phone": "",
+        "education": "",
+        "role": "user",
+        "plan": "free"
+    },
+    {
+        "email": "pavankumar2003@gmail.com",
+        "password": "scrypt:32768:8:1$u6soA39VYb6VyO9G$8e67365d9111d813a431de0049ef08af5bce9bd3f3112daa9eea489ce844eb4dd8a5d11234d4529107144a23fcab58b822bce504e3b4744d25ac1eb87b1575d8",
+        "full_name": "varun",
+        "phone": "7204055072",
+        "education": "mca",
+        "skills": [
+            "python"
+        ],
+        "role": "user",
+        "plan": "premium"
+    },
+    {
+        "full_name": "Pavankumar B V",
+        "email": "pavankumarpavan15614@gmail.com",
+        "password": "scrypt:32768:8:1$7PbfkALOLA7gnHX1$dec372e86fa91f903944799fbde31f524d3eac61ac03d31ec3c3292194f8cef8c208fca66c0a8ae1148467fba648b69311fa377d4d47b8d72a5447364596b75c",
+        "role": "admin",
+        "plan": "premium"
+    },
+    {
+        "email": "makamabhi@gmail.com",
+        "password": "scrypt:32768:8:1$3tWM9xK5g1WclmeK$6cadc6d44dbc602a83a9a05adeacc5defc8f2becbeb4e570f9db9c92b87f56079c660d0d64724d916c35d8b6498a40d5f93a4a8dc92b515828bd8852b0aa7596",
+        "full_name": "abhi",
+        "phone": "9110278491",
+        "education": "be",
+        "skills": [
+            "python"
+        ],
+        "role": "user",
+        "plan": "premium",
+        "plan_type": "yearly",
+        "subscription_end": "2027-05-15"
+    },
+    {
+        "email": "chintu@gmail.com",
+        "password": "scrypt:32768:8:1$Z1hrOE1KO6ejgAea$92cef084aac2b935eabe09d678fd53896e92240d1ed3e9796a3dbe9cb0dcaf0439356b70f830997a830ca66ab2cabb5bdb48cf38019d6989d083e4b01252b431",
+        "full_name": "chintu",
+        "phone": "7349587481",
+        "education": "mca",
+        "skills": [
+            "c"
+        ],
+        "role": "user",
+        "plan": "premium",
+        "plan_type": "yearly",
+        "subscription_end": "2027-05-15"
+    }
+]

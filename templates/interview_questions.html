@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}AI Interview Question Generator - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-5xl">
+  <!-- Header -->
+  <div class="text-center mb-12 fade-in">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-4">
+      <i class="fas fa-clipboard-question"></i> AI Interview Prep
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black text-white font-heading tracking-tight mb-4">
+      Interview <span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Question Generator</span>
+    </h1>
+    <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+      Prepare for your next big interview. Select a saved resume and let our AI generate tailored Technical and HR questions based on your specific profile.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left Column: Controls -->
+    <div class="lg:col-span-1 fade-in" style="animation-delay: 0.1s;">
+      <div class="glass-card p-6 sticky top-24">
+        <h2 class="text-xl font-bold text-white mb-6 border-b border-slate-700/50 pb-4">Configuration</h2>
+        
+        <form id="generate-form" class="space-y-5">
+          <!-- Input Source -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Data Source</label>
+            <div class="grid grid-cols-2 gap-3" id="input-source-container">
+              <label class="cursor-pointer">
+                <input type="radio" name="input_source" value="saved" class="sr-only" checked onchange="updateInputSourceUI()">
+                <div id="saved-source-btn" class="text-center px-4 py-3 border rounded-xl transition-all text-sm font-medium border-indigo-500/50 bg-indigo-500/10 text-indigo-400">
+                  <i class="fas fa-bookmark mr-1"></i> Saved Resume
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="input_source" value="upload" class="sr-only" onchange="updateInputSourceUI()">
+                <div id="upload-source-btn" class="text-center px-4 py-3 border border-slate-700 rounded-xl bg-slate-900/30 text-slate-400 transition-all text-sm font-medium">
+                  <i class="fas fa-file-upload mr-1"></i> Upload Fresh
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Resume Selection -->
+          <div id="saved-resume-container">
+            <label class="block text-sm font-medium text-slate-300 mb-2">Select Saved Resume</label>
+            <div class="relative">
+              <select id="resume_id" name="resume_id" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white appearance-none focus:outline-none focus:border-indigo-500 transition-colors">
+                <option value="" disabled selected>Choose a resume...</option>
+                {% for r in resumes %}
+                <option value="{{ r.id }}">{{ r.resume_name }} ({{ r.email }}) - {{ r.created_at[:10] }}</option>
+                {% endfor %}
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                <i class="fas fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div id="upload-resume-container" class="hidden">
+            <label class="block text-sm font-medium text-slate-300 mb-2">Upload Resume (PDF)</label>
+            <input type="file" id="resume_file" name="resume_file" accept=".pdf" class="w-full text-sm text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20">
+          </div>
+          
+          <!-- Experience Level -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Experience Level</label>
+            <div class="grid grid-cols-2 gap-3" id="exp-level-container">
+              <label class="cursor-pointer">
+                <input type="radio" name="experience_level" value="Fresher" class="sr-only" checked onchange="updateExpLevelUI()">
+                <div id="fresher-btn" class="text-center px-4 py-3 border rounded-xl transition-all text-sm font-medium border-indigo-500/50 bg-indigo-500/10 text-indigo-400">
+                  Fresher
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="experience_level" value="Experienced" class="sr-only" onchange="updateExpLevelUI()">
+                <div id="experienced-btn" class="text-center px-4 py-3 border border-slate-700 rounded-xl bg-slate-900/30 text-slate-400 transition-all text-sm font-medium">
+                  Experienced
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Number of Questions -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Questions Per Category (<span id="q-count-display">5</span>)</label>
+            <input type="range" id="num_questions" name="num_questions" min="2" max="10" value="5" class="w-full accent-indigo-500" oninput="document.getElementById('q-count-display').innerText=this.value">
+            <div class="flex justify-between text-xs text-slate-500 mt-1">
+              <span>2</span>
+              <span>10</span>
+            </div>
+          </div>
+          
+          <button type="submit" id="generate-btn" class="w-full btn-premium btn-primary py-3 flex justify-center items-center gap-2 mt-4">
+            <i class="fas fa-magic"></i> Generate Questions
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Right Column: Results -->
+    <div class="lg:col-span-2 fade-in" style="animation-delay: 0.2s;">
+      
+      <!-- Initial State -->
+      <div id="initial-state" class="glass-card h-full p-12 flex flex-col items-center justify-center text-center">
+        <div class="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-clipboard-list text-3xl text-slate-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2">Ready to Prep?</h3>
+        <p class="text-slate-400 max-w-md">
+          Configure your preferences on the left and hit generate. Our Neural AI will formulate the perfect questions based on your resume data.
+        </p>
+      </div>
+      
+      <!-- Loading State -->
+      <div id="loading-state" class="glass-card h-full p-12 flex flex-col items-center justify-center text-center hidden">
+        <div class="relative w-24 h-24 mb-8">
+          <div class="absolute inset-0 border-t-[3px] border-indigo-500 rounded-full animate-spin"></div>
+          <div class="absolute inset-2 border-r-[3px] border-purple-500 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <i class="fas fa-brain text-2xl text-slate-300 animate-pulse"></i>
+          </div>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2 animate-pulse">Analyzing Resume Profile...</h3>
+        <p class="text-slate-400 text-sm">Crafting hyper-relevant questions for you.</p>
+      </div>
+      
+      <!-- Results State -->
+      <div id="results-state" class="space-y-6 hidden">
+        
+        <!-- Action Bar -->
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-2xl font-bold text-white font-heading">Your Interview Guide</h2>
+          <button onclick="document.getElementById('generate-form').dispatchEvent(new Event('submit'))" class="text-sm text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 rounded-lg">
+            <i class="fas fa-rotate-right"></i> Regenerate
+          </button>
+        </div>
+        
+        <!-- Technical Questions -->
+        <div class="glass-card p-6 lg:p-8 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-bl-full -z-0"></div>
+          <div class="flex items-center gap-3 mb-6 relative z-10">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Technical Questions</h3>
+          </div>
+          <div class="space-y-4 relative z-10" id="tech-questions-container">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+        
+        <!-- HR Questions -->
+        <div class="glass-card p-6 lg:p-8 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-bl-full -z-0"></div>
+          <div class="flex items-center gap-3 mb-6 relative z-10">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">HR & Behavioral Questions</h3>
+          </div>
+          <div class="space-y-4 relative z-10" id="hr-questions-container">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle Input Source UI
+window.updateInputSourceUI = function() {
+  const isSaved = document.querySelector('input[name="input_source"][value="saved"]').checked;
+  const savedBtn = document.getElementById('saved-source-btn');
+  const uploadBtn = document.getElementById('upload-source-btn');
+  const savedContainer = document.getElementById('saved-resume-container');
+  const uploadContainer = document.getElementById('upload-resume-container');
+  
+  if (isSaved) {
+    savedBtn.className = "text-center px-4 py-3 border rounded-xl transition-all text-sm font-medium border-indigo-500/50 bg-indigo-500/10 text-indigo-400";
+    uploadBtn.className = "text-center px-4 py-3 border border-slate-700 rounded-xl bg-slate-900/30 text-slate-400 transition-all text-sm font-medium";
+    savedContainer.classList.remove('hidden');
+    uploadContainer.classList.add('hidden');
+  } else {
+    savedBtn.className = "text-center px-4 py-3 border border-slate-700 rounded-xl bg-slate-900/30 text-slate-400 transition-all text-sm font-medium";
+    uploadBtn.className = "text-center px-4 py-3 border rounded-xl transition-all text-sm font-medium border-indigo-500/50 bg-indigo-500/10 text-indigo-400";
+    savedContainer.classList.add('hidden');
+    uploadContainer.classList.remove('hidden');
+  }
+};
+
+// Update Experience Level UI
+window.updateExpLevelUI = function() {
+  const isFresher = document.querySelector('input[name="experience_level"][value="Fresher"]').checked;
+  const fresherBtn = document.getElementById('fresher-btn');
+  const experiencedBtn = document.getElementById('experienced-btn');
+  
+  if (isFresher) {
+    fresherBtn.className = "text-center px-4 py-3 border rounded-xl transition-all text-sm font-medium border-indigo-500/50 bg-indigo-500/10 text-indigo-400";
+    experiencedBtn.className = "text-center px-4 py-3 border border-slate-700 rounded-xl bg-slate-900/30 text-slate-400 transition-all text-sm font-medium";
+  } else {
+    fresherBtn.className = "text-center px-4 py-3 border border-slate-700 rounded-xl bg-slate-900/30 text-slate-400 transition-all text-sm font-medium";
+    experiencedBtn.className = "text-center px-4 py-3 border rounded-xl transition-all text-sm font-medium border-indigo-500/50 bg-indigo-500/10 text-indigo-400";
+  }
+};
+
+document.getElementById('generate-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const inputSource = document.querySelector('input[name="input_source"]:checked').value;
+  const experienceLevel = document.querySelector('input[name="experience_level"]:checked').value;
+  const numQuestions = document.getElementById('num_questions').value;
+  
+  let fetchOptions = {
+    method: 'POST'
+  };
+  
+  if (inputSource === 'saved') {
+    const resumeId = document.getElementById('resume_id').value;
+    if(!resumeId) {
+      alert("Please select a saved resume first.");
+      return;
+    }
+    fetchOptions.headers = { 'Content-Type': 'application/json' };
+    fetchOptions.body = JSON.stringify({
+      resume_id: resumeId,
+      experience_level: experienceLevel,
+      num_questions: numQuestions
+    });
+  } else {
+    const fileInput = document.getElementById('resume_file');
+    if(!fileInput.files.length) {
+      alert("Please upload a PDF resume first.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append('resume_file', fileInput.files[0]);
+    formData.append('experience_level', experienceLevel);
+    formData.append('num_questions', numQuestions);
+    fetchOptions.body = formData;
+  }
+  
+  // UI States
+  document.getElementById('initial-state').classList.add('hidden');
+  document.getElementById('results-state').classList.add('hidden');
+  document.getElementById('loading-state').classList.remove('hidden');
+  
+  const btn = document.getElementById('generate-btn');
+  const orgBtnContent = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating...';
+  
+  try {
+    const response = await fetch('/interview-questions', fetchOptions);
+    
+    const data = await response.json();
+    
+    if(data.success) {
+      renderQuestions(data.questions);
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('results-state').classList.remove('hidden');
+    } else {
+      alert("Error: " + (data.error || "Failed to generate questions."));
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('initial-state').classList.remove('hidden');
+    }
+    
+  } catch (err) {
+    console.error(err);
+    alert("System Error: Could not connect to the server.");
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('initial-state').classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orgBtnContent;
+  }
+});
+
+function renderQuestions(questionsData) {
+  const techContainer = document.getElementById('tech-questions-container');
+  const hrContainer = document.getElementById('hr-questions-container');
+  
+  techContainer.innerHTML = '';
+  hrContainer.innerHTML = '';
+  
+  if(questionsData.technical_questions && questionsData.technical_questions.length > 0) {
+    questionsData.technical_questions.forEach((q, idx) => {
+      techContainer.innerHTML += `
+        <div class="p-4 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-indigo-500/30 transition-colors group">
+          <div class="flex gap-4">
+            <div class="text-indigo-500/50 font-black text-xl w-6 shrink-0 pt-0.5">Q${idx + 1}</div>
+            <div class="text-slate-200 group-hover:text-white transition-colors text-base leading-relaxed">${q}</div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    techContainer.innerHTML = '<div class="text-slate-500 italic">No technical questions generated.</div>';
+  }
+  
+  if(questionsData.hr_questions && questionsData.hr_questions.length > 0) {
+    questionsData.hr_questions.forEach((q, idx) => {
+      hrContainer.innerHTML += `
+        <div class="p-4 bg-slate-900/50 border border-slate-800 rounded-xl hover:border-purple-500/30 transition-colors group">
+          <div class="flex gap-4">
+            <div class="text-purple-500/50 font-black text-xl w-6 shrink-0 pt-0.5">Q${idx + 1}</div>
+            <div class="text-slate-200 group-hover:text-white transition-colors text-base leading-relaxed">${q}</div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    hrContainer.innerHTML = '<div class="text-slate-500 italic">No HR questions generated.</div>';
+  }
+}
+</script>
+{% endblock %}

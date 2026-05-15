@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Career Growth Roadmap - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-5xl">
+    <div class="text-center mb-12 fade-in">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
+            <i class="fas fa-route text-xs animate-pulse"></i> Neural Career Coach
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-white font-heading mb-6 tracking-tighter">
+            Career Growth <span class="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent italic">Roadmap</span>
+        </h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Generate a personalized, step-by-step masterplan to achieve your dream role. Powered by our Career AI.
+        </p>
+    </div>
+
+    <div class="glass-card gradient-border p-8 mb-16 max-w-3xl mx-auto group fade-in shadow-2xl relative">
+        <div class="mb-6 flex flex-wrap justify-center gap-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mr-2 py-2">Quick Paths:</span>
+            <button onclick="fillForm('Data Scientist')" class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Data Scientist</button>
+            <button onclick="fillForm('Cloud Architect')" class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Cloud Architect</button>
+            <button onclick="fillForm('Product Manager')" class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Product Manager</button>
+            <button onclick="fillForm('Cybersecurity Analyst')" class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Cybersecurity</button>
+        </div>
+
+        <div class="relative">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 pl-2">Target Job Role</label>
+            <div class="bg-slate-900/80 rounded-2xl border border-slate-700 p-4 flex items-center focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all shadow-inner">
+                <i class="fas fa-flag-checkered text-emerald-400 opacity-70 ml-1 mr-4 text-lg"></i>
+                <input type="text" id="roleInput" class="w-full bg-transparent border-none text-white font-medium focus:outline-none focus:ring-0 placeholder-slate-600 focus:placeholder-slate-500" placeholder="e.g. Data Scientist, Front-End Developer">
+            </div>
+            
+            <button onclick="generateRoadmap()" id="generateBtn" class="w-full btn-premium bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 py-4 mt-6 transition-all duration-300 rounded-2xl shadow-[0_4px_20px_rgba(16,185,129,0.3)] group/btn relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
+                <span id="btnText" class="flex items-center justify-center gap-3 uppercase tracking-[0.2em] font-black text-sm text-white">
+                    <i class="fas fa-magic text-yellow-300 group-hover/btn:scale-110 group-hover/btn:rotate-12 transition-all"></i> Generate Masterplan
+                </span>
+                <span id="btnLoader" class="hidden flex items-center justify-center gap-3 uppercase tracking-widest font-black text-xs text-emerald-100">
+                    <i class="fas fa-spinner fa-spin text-lg"></i> Mapping Career Path...
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Timeline Results -->
+    <div id="roadmapContainer" class="hidden max-w-4xl mx-auto px-4 fade-in pb-20">
+        <h3 class="text-2xl font-bold text-white mb-10 font-heading text-center border-b border-slate-800 pb-6 uppercase tracking-widest">
+            The <span id="resRole" class="text-emerald-400"></span> Roadmap
+        </h3>
+        <div class="relative border-l-2 border-slate-700 ml-4 md:ml-8" id="timelineList">
+            <!-- Timeline items rendered via JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function fillForm(role) {
+        const input = document.getElementById('roleInput');
+        input.value = role;
+        // Trigger a tiny animation on input fill
+        input.parentElement.classList.add('ring-2', 'ring-emerald-500/50', 'border-emerald-500');
+        setTimeout(() => {
+            input.parentElement.classList.remove('ring-2', 'ring-emerald-500/50', 'border-emerald-500');
+        }, 300);
+    }
+
+    async function generateRoadmap() {
+        const role = document.getElementById('roleInput').value.trim();
+        if (!role) {
+            const container = document.getElementById('roleInput').parentElement;
+            container.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
+            setTimeout(() => container.classList.remove('border-red-500', 'ring-2', 'ring-red-500/50'), 600);
+            return;
+        }
+
+        const btn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        const container = document.getElementById('roadmapContainer');
+
+        btn.disabled = true;
+        btn.classList.add('opacity-80', 'cursor-wait');
+        btnText.classList.add('hidden');
+        btnLoader.classList.remove('hidden');
+        container.classList.add('hidden');
+
+        try {
+            const response = await fetch('/generate-roadmap', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: role })
+            });
+            const data = await response.json();
+
+            if (data.success && data.roadmap) {
+                document.getElementById('resRole').textContent = role;
+                const list = document.getElementById('timelineList');
+                list.innerHTML = '';
+                
+                data.roadmap.forEach((step, index) => {
+                    const delay = index * 150;
+                    list.innerHTML += `
+                        <div class="mb-12 ml-8 relative fade-in" style="animation-delay: ${delay}ms; animation-fill-mode: both;">
+                            <span class="absolute -left-12 flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 border-2 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)] z-10 font-bold text-xs ring-4 ring-slate-900/80">
+                                ${index + 1}
+                            </span>
+                            <div class="glass-card p-6 md:p-8 border-l-4 border-emerald-500 hover:border-cyan-400 transition-colors group/card">
+                                <h4 class="text-xl font-bold text-white font-heading mb-3 group-hover/card:text-emerald-300 transition-colors">${step.title}</h4>
+                                <div class="inline-block px-3 py-1 bg-slate-900/80 border border-slate-700/50 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
+                                    <i class="far fa-clock mr-1 text-emerald-500/80"></i> ${step.timeframe}
+                                </div>
+                                <p class="text-slate-300 text-sm leading-relaxed mb-6">${step.description}</p>
+                                ${step.actions ? `
+                                    <div class="bg-slate-900/40 rounded-xl p-4 border border-slate-800/50">
+                                        <h5 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Action Items</h5>
+                                        <ul class="space-y-3">
+                                            ${step.actions.map(action => `
+                                                <li class="text-sm text-slate-300 flex items-start gap-3">
+                                                    <i class="fas fa-arrow-right text-emerald-500 text-[10px] mt-1 opacity-70"></i> 
+                                                    <span>${action}</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.classList.remove('hidden');
+                setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+            } else {
+                alert('Generation failed: ' + (data.error || 'Unknown error'));
+            }
+        } catch (e) {
+            alert('A network error occurred while connecting to the AI.');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-80', 'cursor-wait');
+            btnText.classList.remove('hidden');
+            btnLoader.classList.add('hidden');
+        }
+    }
+
+    document.getElementById('roleInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') generateRoadmap();
+    });
+</script>
+{% endblock %}

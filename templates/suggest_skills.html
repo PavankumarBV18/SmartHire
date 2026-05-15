@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}AI Skill Suggestion Engine - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-5xl">
+    <!-- Header -->
+    <div class="text-center mb-12 fade-in">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
+            <i class="fas fa-brain text-xs animate-pulse"></i> Neural Skill Engine
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-white font-heading mb-6 tracking-tighter">
+            Smart Skill <span
+                class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent italic">Suggestions</span>
+        </h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Discover the exact skills recruiters and ATS algorithms are looking for. Tell us your target role, and our
+            AI will parse millions of data points to guide you.
+        </p>
+    </div>
+
+    <!-- Interactive Input Card -->
+    <div class="glass-card gradient-border p-8 mb-16 max-w-3xl mx-auto group fade-in shadow-2xl relative">
+
+        <!-- Popular Roles Quick Select -->
+        <div class="mb-6 flex flex-wrap justify-center gap-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mr-2 py-2">Quick Picks:</span>
+            <button onclick="fillForm('Software Engineer', 'Technology')"
+                class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Software
+                Engineer</button>
+            <button onclick="fillForm('Data Analyst', 'Data Science')"
+                class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Data
+                Analyst</button>
+            <button onclick="fillForm('Product Manager', 'Technology')"
+                class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Product
+                Manager</button>
+            <button onclick="fillForm('Financial Analyst', 'Finance')"
+                class="px-3 py-1.5 rounded-full bg-slate-800 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">Finance</button>
+        </div>
+
+        <div class="space-y-6">
+            <div class="flex flex-col md:flex-row gap-5">
+                <!-- Role Input -->
+                <div class="flex-1 relative">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 pl-2">Target
+                        Job Role</label>
+                    <div
+                        class="bg-slate-900/80 rounded-2xl border border-slate-700 p-4 flex items-center focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all shadow-inner">
+                        <i class="fas fa-briefcase text-indigo-400 opacity-70 ml-1 mr-4 text-lg"></i>
+                        <input type="text" id="roleInput"
+                            class="w-full bg-transparent border-none text-white font-medium focus:outline-none focus:ring-0 placeholder-slate-600"
+                            placeholder="e.g. Marketing Director">
+                    </div>
+                </div>
+                <!-- Industry Input -->
+                <div class="flex-1 relative">
+                    <label
+                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 pl-2">Industry
+                        Sector</label>
+                    <div
+                        class="bg-slate-900/80 rounded-2xl border border-slate-700 p-4 flex items-center focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-500/20 transition-all shadow-inner">
+                        <i class="fas fa-city text-purple-400 opacity-70 ml-1 mr-4 text-lg"></i>
+                        <input type="text" id="industryInput"
+                            class="w-full bg-transparent border-none text-white font-medium focus:outline-none focus:ring-0 placeholder-slate-600"
+                            placeholder="e.g. E-Commerce">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button onclick="suggestSkills()" id="suggestBtn"
+                class="w-full btn-premium bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 py-4 mt-4 transition-all duration-300 rounded-2xl shadow-[0_4px_20px_rgba(99,102,241,0.3)] group/btn">
+                <span id="btnText"
+                    class="flex items-center justify-center gap-3 uppercase tracking-[0.2em] font-black text-sm text-white">
+                    <i class="fas fa-bolt text-amber-400 group-hover/btn:scale-110 transition-transform"></i> Generate
+                    Strategy
+                </span>
+                <span id="btnLoader"
+                    class="hidden flex items-center justify-center gap-3 uppercase tracking-widest font-black text-xs text-indigo-100">
+                    <i class="fas fa-spinner fa-spin text-lg"></i> Mining Industry Data...
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Results Display -->
+    <div id="resultsContainer" class="hidden">
+        <div class="flex items-center justify-between mb-8 max-w-4xl mx-auto px-4 fade-in">
+            <h3 class="text-xl md:text-2xl font-bold text-white font-heading flex flex-col">
+                <span class="text-xs text-slate-400 font-sans tracking-widest uppercase mb-1">Recommended Portfolio
+                    for</span>
+                <span id="resRole" class="text-indigo-400"></span>
+            </h3>
+        </div>
+
+        <div
+            class="glass-card p-8 md:p-12 mb-20 max-w-4xl mx-auto shadow-2xl relative overflow-hidden fade-in border-t border-l border-white/5 border-r border-b border-black/50">
+            <!-- Decorative Icon -->
+            <div class="absolute top-0 right-0 p-8 opacity-5 text-indigo-500 pointer-events-none">
+                <i class="fas fa-bullseye text-9xl"></i>
+            </div>
+
+            <p class="text-sm text-slate-400 mb-8 max-w-lg">Incorporate these high-value keywords naturally into your
+                resume bullets and skills section to drastically improve ATS parsing rates.</p>
+
+            <div id="skillsList" class="flex flex-wrap gap-4 relative z-10">
+                <!-- Dynamic badges populated via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .skill-badge {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border-radius: 9999px;
+        padding: 0.8rem 1.7rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #f8fafc;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        cursor: default;
+    }
+
+    .skill-badge:hover {
+        border-color: rgba(139, 92, 246, 0.6);
+        background: linear-gradient(135deg, rgba(49, 46, 129, 0.4), rgba(30, 41, 59, 0.9));
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2), 0 4px 6px -2px rgba(99, 102, 241, 0.1);
+    }
+</style>
+
+<script>
+    function fillForm(role, ind) {
+        document.getElementById('roleInput').value = role;
+        document.getElementById('industryInput').value = ind;
+    }
+
+    async function suggestSkills() {
+        const role = document.getElementById('roleInput').value.trim();
+        const industry = document.getElementById('industryInput').value.trim();
+
+        if (!role) {
+            // Visual feedback for empty input
+            const roleContainer = document.getElementById('roleInput').parentElement;
+            roleContainer.classList.add('border-red-500', 'ring-2', 'ring-red-500/20');
+            setTimeout(() => roleContainer.classList.remove('border-red-500', 'ring-2', 'ring-red-500/20'), 1500);
+            return;
+        }
+
+        const btn = document.getElementById('suggestBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        const container = document.getElementById('resultsContainer');
+
+        // UI Loading State
+        btn.disabled = true;
+        btn.classList.add('opacity-80', 'cursor-wait');
+        btnText.classList.add('hidden');
+        btnLoader.classList.remove('hidden');
+        container.classList.add('hidden');
+
+        try {
+            const response = await fetch('/suggest-skills', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: role, industry: industry })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                const skills = data.skills || [];
+                document.getElementById('resRole').textContent = role + (industry ? ` (${industry})` : '');
+
+                const list = document.getElementById('skillsList');
+                list.innerHTML = '';
+                skills.forEach((skill, index) => {
+                    const delay = index * 50; // stagger animation
+                    list.innerHTML += `
+                        <div class="skill-badge fade-in" style="animation-delay: ${delay}ms; animation-fill-mode: both;">
+                            <i class="fas fa-check-circle text-indigo-400 text-sm"></i>
+                            <span>${skill}</span>
+                        </div>
+                    `;
+                });
+
+                container.classList.remove('hidden');
+                setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+            } else {
+                alert('Analysis failed: ' + data.error);
+            }
+        } catch (e) {
+            alert('A network error occurred while connecting to the AI.');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-80', 'cursor-wait');
+            btnText.classList.remove('hidden');
+            btnLoader.classList.add('hidden');
+        }
+    }
+
+    // Handle Enter key
+    document.getElementById('roleInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') suggestSkills();
+    });
+    document.getElementById('industryInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') suggestSkills();
+    });
+</script>
+{% endblock %}

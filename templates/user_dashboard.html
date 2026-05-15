@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard | SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12 max-w-7xl">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 fade-in">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold mb-4 tracking-wider uppercase">
+                <i class="fas fa-home"></i> Welcome Back
+            </div>
+            <h1 class="text-4xl font-bold text-white font-heading">
+                Your Career <span class="bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">Command Center</span>
+            </h1>
+            <p class="text-slate-400 mt-2">Manage your resumes, track job matches, and upgrade your skills.</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="px-4 py-2 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="text-left">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase leading-none mb-1">Current Plan</p>
+                    <p class="text-white font-bold text-sm leading-none flex items-center gap-2">
+                        {{ session.get('plan', 'Free').upper() }}
+                        {% if session.get('plan') == 'premium' %}
+                        <i class="fas fa-crown text-amber-400 text-[10px]"></i>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+            <a href="/subscription" class="btn-premium btn-primary py-2 px-6 text-xs uppercase font-black tracking-widest">
+                Upgrade Now
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Feature Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 fade-in" style="animation-delay: 0.1s">
+        <!-- Resume Creator -->
+        <a href="/create" class="group">
+            <div class="glass-card p-8 h-full border-amber-500/10 hover:border-amber-500/30 transition-all duration-300">
+                <div class="w-14 h-14 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-wand-magic-sparkles text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Resume Creator</h3>
+                <p class="text-slate-400 text-sm mb-6">Build a professional, ATS-optimized resume manually from scratch.</p>
+                <div class="flex items-center text-amber-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Build Now <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+        <!-- Resume Analysis (ATS) -->
+        <a href="/upload-home" id="upload-card-step" class="group">
+            <div class="glass-card p-8 h-full border-indigo-500/10 hover:border-indigo-500/30 transition-all duration-300">
+                <div class="w-14 h-14 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-file-invoice text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">ATS Score & Analysis</h3>
+                <p class="text-slate-400 text-sm mb-6">Upload your resume to get an instant ATS score and semantic analysis.</p>
+                <div class="flex items-center text-indigo-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Open Tool <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- JD Analyzer -->
+        <a href="/analyze-jd" class="group">
+            <div class="glass-card p-8 h-full border-cyan-500/10 hover:border-cyan-500/30 transition-all duration-300">
+                <div class="w-14 h-14 bg-cyan-600/20 text-cyan-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-crosshairs text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">AI JD Analyzer</h3>
+                <p class="text-slate-400 text-sm mb-6">Analyze job descriptions instantly to identify the exact keywords and skills needed.</p>
+                <div class="flex items-center text-cyan-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Analyze JD <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Interview Preparation (LOCKED) -->
+        <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/interview-questions{% else %}javascript:showPremiumModal(){% endif %}" class="group">
+            <div class="glass-card p-8 h-full border-emerald-500/10 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
+                {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+                <div class="absolute top-4 right-4 px-2 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded flex items-center gap-1">
+                    <i class="fas fa-lock"></i> Premium
+                </div>
+                {% endif %}
+                <div class="w-14 h-14 bg-emerald-600/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-comments text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Interview Preparation</h3>
+                <p class="text-slate-400 text-sm mb-6">Practice with AI-generated technical and HR questions tailored to your resume.</p>
+                <div class="flex items-center text-emerald-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Start Prep <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Resume History -->
+        <a href="/saved-resumes" id="nav-skill-engine" class="group">
+            <div class="glass-card p-8 h-full border-blue-500/10 hover:border-blue-500/30 transition-all duration-300">
+                <div class="w-14 h-14 bg-blue-600/20 text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-bell text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Resume History</h3>
+                <p class="text-slate-400 text-sm mb-6">Access all your previously analyzed resumes and generated versions.</p>
+                <div class="flex items-center text-blue-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    View History <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Career Roadmap (Premium - LOCKED) -->
+        <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/roadmap{% else %}javascript:showPremiumModal(){% endif %}" id="nav-roadmap" class="group">
+            <div class="glass-card p-8 h-full border-purple-500/10 hover:border-purple-500/30 transition-all duration-300 relative overflow-hidden">
+                {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+                <div class="absolute top-4 right-4 px-2 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-400 text-[10px] font-black uppercase tracking-widest rounded flex items-center gap-1">
+                    <i class="fas fa-lock"></i> Premium
+                </div>
+                {% endif %}
+                <div class="w-14 h-14 bg-purple-600/20 text-purple-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-map-location-dot text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Career Roadmap</h3>
+                <p class="text-slate-400 text-sm mb-6">Get a personalized AI roadmap to reach your target job role faster.</p>
+                <div class="flex items-center text-purple-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Explore <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+
+        <!-- Content Enhancer (FREE) -->
+        <a href="/enhance-content" class="group">
+            <div class="glass-card p-8 h-full border-indigo-500/10 hover:border-indigo-500/30 transition-all duration-300 relative overflow-hidden">
+                <div class="w-14 h-14 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-wand-sparkles text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">AI Content Enhancer</h3>
+                <p class="text-slate-400 text-sm mb-6">Rewrite your resume bullets with powerful AI-driven action verbs and impact metrics.</p>
+                <div class="flex items-center text-indigo-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Enhance Now <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Voice Assistant (FREE) -->
+        <a href="javascript:toggleChat()" class="group">
+            <div class="glass-card p-8 h-full border-red-500/10 hover:border-red-500/30 transition-all duration-300 relative overflow-hidden">
+                <div class="w-14 h-14 bg-red-600/20 text-red-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-microphone-lines text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Voice Assistant</h3>
+                <p class="text-slate-400 text-sm mb-6">Talk to our AI career assistant using voice commands to get instant advice.</p>
+                <div class="flex items-center text-red-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Start Speaking <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Resume Comparison (Premium - LOCKED) -->
+        <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/compare-resumes{% else %}javascript:showPremiumModal(){% endif %}" class="group">
+            <div class="glass-card p-8 h-full border-emerald-500/10 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
+                {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+                <div class="absolute top-4 right-4 px-2 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded flex items-center gap-1">
+                    <i class="fas fa-lock"></i> Premium
+                </div>
+                {% endif %}
+                <div class="w-14 h-14 bg-emerald-600/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-code-compare text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Resume Comparison</h3>
+                <p class="text-slate-400 text-sm mb-6">Compare two versions of your resume to see which one performs better with ATS.</p>
+                <div class="flex items-center text-emerald-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Compare Now <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Market Demand (Premium - LOCKED) -->
+        <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/market-demand{% else %}javascript:showPremiumModal(){% endif %}" class="group">
+            <div class="glass-card p-8 h-full border-blue-500/10 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden">
+                {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
+                <div class="absolute top-4 right-4 px-2 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-widest rounded flex items-center gap-1">
+                    <i class="fas fa-lock"></i> Premium
+                </div>
+                {% endif %}
+                <div class="w-14 h-14 bg-blue-600/20 text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Market Demand</h3>
+                <p class="text-slate-400 text-sm mb-6">Discover trending skills and technologies for your target role in the 2025 job market.</p>
+                <div class="flex items-center text-blue-400 text-xs font-bold uppercase tracking-widest gap-2">
+                    Check Trends <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Premium Feature Modal -->
+<div id="premium-modal" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="hidePremiumModal()"></div>
+    <div class="glass-card p-10 max-w-md w-full relative z-10 border border-indigo-500/30 text-center animate-in fade-in zoom-in duration-300">
+        <div class="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">🔒 Premium Feature</h2>
+        <p class="text-slate-400 mb-8">Subscribe to unlock this feature and skyrocket your career with AI intelligence.</p>
+        <div class="flex flex-col gap-3">
+            <a href="/subscription" class="btn-premium btn-primary py-3 px-6 text-sm uppercase tracking-widest font-black shadow-lg">
+                ⭐ Upgrade Subscription
+            </a>
+            <button onclick="hidePremiumModal()" class="py-3 px-6 text-slate-500 hover:text-white transition-colors text-xs uppercase tracking-widest font-bold">
+                Maybe Later
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showPremiumModal() {
+    document.getElementById('premium-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function hidePremiumModal() {
+    document.getElementById('premium-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+</script>
+{% endblock %}

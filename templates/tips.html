@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Career Intelligence Tips - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6">
+  <!-- Header -->
+  <div class="max-w-4xl mx-auto text-center mb-16 fade-in">
+    <h1 class="text-4xl md:text-6xl font-bold mb-6 font-heading">
+      Expert <span class="text-indigo-400">Career Insights</span>
+    </h1>
+    <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+      Master the art of resume building with our curated collection of best practices and ATS-optimization strategies.
+    </p>
+  </div>
+
+  <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 fade-in" style="animation-delay: 0.2s">
+    <!-- DO's Section -->
+    <div class="glass-card p-8 border-emerald-500/20 bg-emerald-500/[0.02]">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center">
+          <i class="fas fa-check-double text-xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white font-heading">Best Practices</h2>
+      </div>
+
+      <ul class="space-y-5">
+        {% set dos = [
+        ('Use Standard Fonts', 'Calibri, Arial, or Georgia (10-12pt) ensure cross-device readability.'),
+        ('Keyword Optimization', 'Match job descriptions naturally within your experience bullet points.'),
+        ('Quantify Success', 'Use data (e.g., "Increased efficiency by 40%") to show impact.'),
+        ('PDF Formatting', 'Always export as PDF to lock in your professional layout.')
+        ] %}
+
+        {% for title, desc in dos %}
+        <li class="group">
+          <div class="flex items-start gap-4">
+            <div class="mt-1 text-emerald-500 flex-shrink-0"><i class="fas fa-circle-check"></i></div>
+            <div>
+              <div class="font-bold text-slate-200 group-hover:text-white transition-colors">{{ title }}</div>
+              <div class="text-sm text-slate-400 leading-relaxed mt-1">{{ desc }}</div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- DON'Ts Section -->
+    <div class="glass-card p-8 border-red-500/20 bg-red-500/[0.02]">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 bg-red-500/10 text-red-400 rounded-xl flex items-center justify-center">
+          <i class="fas fa-triangle-exclamation text-xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white font-heading">Common Pitfalls</h2>
+      </div>
+
+      <ul class="space-y-5">
+        {% set donts = [
+        ('Avoid Tables & Columns', 'ATS parsing engines often struggle with multi-column layouts.'),
+        ('No Headers/Footers', 'Place critical contact info in the main body, not the margin.'),
+        ('Exclude Graphics', 'Images and charts are unreadable by legacy ATS systems.'),
+        ('Skip Profile Photos', 'Keep it professional and focused on your technical skills.')
+        ] %}
+
+        {% for title, desc in donts %}
+        <li class="group">
+          <div class="flex items-start gap-4">
+            <div class="mt-1 text-red-500 flex-shrink-0"><i class="fas fa-circle-xmark"></i></div>
+            <div>
+              <div class="font-bold text-slate-200 group-hover:text-white transition-colors">{{ title }}</div>
+              <div class="text-sm text-slate-400 leading-relaxed mt-1">{{ desc }}</div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Power Words Section -->
+  <div class="glass-card gradient-border p-10 mb-20 fade-in" style="animation-delay: 0.4s">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-white font-heading mb-4">Impactful Action Verbs</h2>
+      <p class="text-slate-400">Replace passive language with these power words across key categories.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {% set categories = [
+      ('Leadership', 'fas fa-id-badge', ['Orchestrated', 'Spearheaded', 'Mentored', 'Cultivated']),
+      ('Efficiency', 'fas fa-gauge-high', ['Accelerated', 'Streamlined', 'Minimized', 'Maximized']),
+      ('Innovation', 'fas fa-microchip', ['Engineered', 'Pioneered', 'Architected', 'Launched']),
+      ('growth', 'fas fa-chart-line', ['Amplified', 'Bolstered', 'Generated', 'Captured'])
+      ] %}
+
+      {% for cat, icon, words in categories %}
+      <div class="bg-slate-800/20 rounded-2xl p-6 border border-slate-700/50">
+        <div class="flex items-center gap-3 mb-4">
+          <i class="{{ icon }} text-indigo-400 text-sm"></i>
+          <h3 class="font-bold text-slate-300 uppercase tracking-widest text-[10px]">{{ cat }}</h3>
+        </div>
+        <ul class="space-y-2">
+          {% for word in words %}
+          <li class="text-slate-200 text-sm font-medium hover:text-indigo-300 transition-colors cursor-default">{{ word
+            }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Bottom CTA -->
+  <div
+    class="max-w-3xl mx-auto text-center bg-indigo-600 rounded-3xl p-12 shadow-2xl relative overflow-hidden mb-20 group">
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-indigo-800 opacity-90"></div>
+    <div
+      class="absolute -bottom-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
+    </div>
+
+    <div class="relative z-10">
+      <h2 class="text-3xl font-bold text-white mb-4 font-heading">Ready to beat the ATS?</h2>
+      <p class="text-indigo-100 mb-8 opacity-80 leading-relaxed">
+        Put these tips into practice and get a professional analysis today.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/upload-home" class="btn-premium bg-white text-indigo-700 hover:scale-105 shadow-xl">
+          <i class="fas fa-file-export mr-2"></i> Upload Resume
+        </a>
+        <a href="/create"
+          class="btn-premium bg-indigo-900/40 text-white border border-indigo-400/30 hover:bg-indigo-900/60">
+          Build from Scratch
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

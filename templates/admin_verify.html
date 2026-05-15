@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Verification | SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 flex items-center justify-center min-h-[70vh]">
+  <div class="glass-card gradient-border p-10 max-w-md w-full fade-in relative overflow-hidden">
+    <!-- Background Accents -->
+    <div class="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl"></div>
+    
+    <div class="text-center mb-8 relative z-10">
+      <div class="w-16 h-16 bg-emerald-600/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+        <i class="fas fa-user-shield text-2xl"></i>
+      </div>
+      <h2 class="text-3xl font-bold text-white mb-2 font-heading">Admin Verification Required</h2>
+      <p class="text-slate-400 text-sm">Please enter the secure admin credentials to continue.</p>
+    </div>
+
+    {% if error %}
+    <div class="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl mb-6 text-sm flex items-center gap-2 relative z-10">
+      <i class="fas fa-exclamation-circle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/admin-verify" class="space-y-5 relative z-10">
+      <div>
+        <label class="block text-slate-300 text-sm font-medium mb-2"><i class="fas fa-key mr-1 opacity-70"></i> Secret Admin Key</label>
+        <div class="relative">
+          <input type="password" name="admin_key" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+          <i class="fas fa-shield-alt absolute left-4 top-3.5 text-slate-500"></i>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-slate-300 text-sm font-medium mb-2"><i class="fas fa-envelope mr-1 opacity-70"></i> Email Address</label>
+        <div class="relative">
+          <input type="email" name="email" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+          <i class="fas fa-at absolute left-4 top-3.5 text-slate-500"></i>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-slate-300 text-sm font-medium mb-2"><i class="fas fa-lock mr-1 opacity-70"></i> Password</label>
+        <div class="relative">
+          <input type="password" name="password" required class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+          <i class="fas fa-asterisk absolute left-4 top-3.5 text-slate-500 text-xs"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full btn-premium btn-outline border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 py-3 mt-4 text-center font-bold tracking-wider transition-all flex justify-center items-center gap-2">
+        Verify & Access Dashboard <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

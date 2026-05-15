@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}SmartHire - An AI Driven Resume Intelligence And ATS Optimization System{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6">
+  <!-- Hero Section -->
+  <div class="max-w-4xl mx-auto text-center mb-20 fade-in">
+    <div
+      class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold mb-6 tracking-wider uppercase">
+      <i class="fas fa-sparkles"></i>
+      The Future of Intelligent Hiring
+    </div>
+    <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight font-heading">
+      Elevate Your Career with <br />
+      <span class="bg-gradient-to-r from-indigo-400 via-white to-emerald-400 bg-clip-text text-transparent">SmartHire
+        Intelligence</span>
+    </h1>
+    <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+      Whether you're starting from scratch or optimizing an existing profile, SmartHire's neural suite ensures you beat
+      the
+      ATS and land your dream role.
+    </p>
+
+    <!-- Simple CTAs if needed, but the cards below are the main actions -->
+  </div>
+
+  <!-- Feature Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20">
+    <!-- Create Resume Card -->
+    <a href="/create" class="group">
+      <div class="glass-card gradient-border p-10 h-full flex flex-col items-center text-center">
+        <div
+          class="w-20 h-20 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+          <i class="fas fa-pen-nib text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-white mb-4 font-heading">Architect Profile</h2>
+        <p class="text-slate-400 mb-8 leading-relaxed">
+          Don't have a resume? Our intuitive AI-guided form generates a professional, high-impact PDF tailored to your
+          industry in seconds.
+        </p>
+        <div class="mt-auto">
+          <span class="btn-premium btn-primary group-hover:px-8 transition-all">
+            Build Now <i
+              class="fas fa-arrow-right ml-2 text-xs opacity-50 group-hover:translate-x-1 transition-transform"></i>
+          </span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Upload/Analyze Card -->
+    <a href="/upload-home" class="group" id="upload-card-step">
+      <div class="glass-card gradient-border p-10 h-full flex flex-col items-center text-center">
+        <div
+          class="w-20 h-20 bg-emerald-600/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+          <i class="fas fa-shield-halved text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-white mb-4 font-heading">ATS Ecosystem Audit</h2>
+        <p class="text-slate-400 mb-8 leading-relaxed">
+          Already have a resume? Upload it to get an instant ATS score, identify missing keywords, and match it against
+          specific job descriptions.
+        </p>
+        <div class="mt-auto">
+          <span
+            class="btn-premium btn-outline border-emerald-500/30 text-emerald-400 group-hover:bg-emerald-500/10 transition-all font-semibold uppercase tracking-wider text-xs">
+            Upload PDF <i
+              class="fas fa-upload ml-2 text-xs opacity-50 group-hover:-translate-y-1 transition-transform"></i>
+          </span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Stats/Trust Section -->
+  <div class="max-w-5xl mx-auto py-12 border-y border-slate-800/30 mb-20">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div>
+        <div class="text-3xl font-bold text-white font-heading">95%</div>
+        <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">ATS Accuracy</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold text-white font-heading">2.5k+</div>
+        <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">Resumes Built</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold text-white font-heading">Llama 3</div>
+        <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">AI Engine</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold text-white font-heading">Real-time</div>
+        <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">Feedback</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

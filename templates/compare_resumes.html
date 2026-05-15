@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Version Comparison - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-5xl">
+    <!-- Header -->
+    <div class="text-center mb-16 fade-in">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+            <i class="fas fa-not-equal text-xs"></i> Version Comparison Engine
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-white font-heading mb-6 tracking-tighter">
+            Smart Resume <span
+                class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent italic">Comparison</span>
+        </h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed opacity-70">
+            Upload your old and new resume versions below. Our AI will perform a deep textual diff and highlight the
+            strategic improvements in keywords, clarity, and ATS readiness.
+        </p>
+    </div>
+
+    <div
+        class="glass-card gradient-border p-8 md:p-12 mb-16 max-w-4xl mx-auto fade-in shadow-2xl relative overflow-hidden">
+        <!-- Subtle background glow -->
+        <div
+            class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none">
+        </div>
+
+        <form id="compareForm" class="space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+                <!-- Decorative vs divider for desktop -->
+                <div
+                    class="hidden md:flex absolute inset-y-0 left-1/2 -translate-x-1/2 items-center justify-center z-10 pointer-events-none">
+                    <div
+                        class="w-10 h-10 rounded-full bg-slate-800 border-4 border-slate-900 flex items-center justify-center text-xs font-black text-slate-500 italic shadow-xl">
+                        VS</div>
+                </div>
+
+                <!-- Old Resume Upload -->
+                <div class="space-y-4">
+                    <label
+                        class="block text-slate-300 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-file-pdf text-slate-500"></i> Version V1 (Old)
+                    </label>
+                    <div class="drop-zone group border-2 border-dashed border-slate-700 bg-slate-800/20 rounded-2xl p-8 text-center hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all cursor-pointer relative overflow-hidden"
+                        data-input="old_resume_input">
+                        <div class="relative z-10 transition-transform duration-300 group-hover:-translate-y-1">
+                            <div
+                                class="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500/20 transition-all duration-500 shadow-lg">
+                                <i
+                                    class="fas fa-cloud-upload-alt text-xl text-slate-500 group-hover:text-emerald-400 transition-colors"></i>
+                            </div>
+                            <p class="text-slate-300 font-bold mb-1">Upload Old Resume</p>
+                            <p class="text-[10px] text-slate-500 uppercase tracking-wider">PDF format</p>
+                            <p class="file-name-display text-sm text-emerald-400 mt-4 font-mono truncate px-4"></p>
+                        </div>
+                    </div>
+                    <input type="file" id="old_resume_input" class="hidden" accept=".pdf" required>
+                </div>
+
+                <!-- New Resume Upload -->
+                <div class="space-y-4">
+                    <label
+                        class="block text-slate-300 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-file-pdf text-teal-400"></i> Version V2 (New)
+                    </label>
+                    <div class="drop-zone group border-2 border-dashed border-slate-700 bg-slate-800/20 rounded-2xl p-8 text-center hover:border-teal-500/50 hover:bg-teal-500/5 transition-all cursor-pointer relative overflow-hidden"
+                        data-input="new_resume_input">
+                        <div class="relative z-10 transition-transform duration-300 group-hover:-translate-y-1">
+                            <div
+                                class="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-teal-500/20 transition-all duration-500 shadow-lg">
+                                <i
+                                    class="fas fa-cloud-upload-alt text-xl text-slate-500 group-hover:text-teal-400 transition-colors"></i>
+                            </div>
+                            <p class="text-slate-300 font-bold mb-1">Upload New Resume</p>
+                            <p class="text-[10px] text-slate-500 uppercase tracking-wider">PDF format</p>
+                            <p class="file-name-display text-sm text-teal-400 mt-4 font-mono truncate px-4"></p>
+                        </div>
+                    </div>
+                    <input type="file" id="new_resume_input" class="hidden" accept=".pdf" required>
+                </div>
+            </div>
+
+            <button type="submit" id="compareBtn"
+                class="w-full btn-premium btn-primary py-4 text-sm mt-8 transition-all duration-300 shadow-[0_4px_20px_rgba(16,185,129,0.3)]">
+                <span id="btnText" class="flex items-center justify-center gap-2 uppercase tracking-widest font-black">
+                    <i class="fas fa-microchip"></i> Run Deep Analysis
+                </span>
+                <span id="btnLoader"
+                    class="hidden flex items-center justify-center gap-2 uppercase tracking-widest font-black text-emerald-100">
+                    <i class="fas fa-circle-notch fa-spin"></i> Analyzing Documents...
+                </span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Results section with a modern cards layout -->
+    <div id="resultsContainer" class="hidden max-w-4xl mx-auto mb-20 fade-in">
+        
+        <!-- Winner Banner -->
+        <div class="glass-card mb-8 p-8 border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.15)] relative overflow-hidden">
+             <div class="absolute -top-4 -right-4 opacity-10 transform rotate-12"><i class="fas fa-trophy text-8xl text-emerald-400"></i></div>
+             <h3 class="text-xs font-black uppercase tracking-[0.2em] text-emerald-400 mb-2">A/B Testing Outcome</h3>
+             <h2 class="text-3xl font-bold text-white font-heading mb-4" id="winnerDisplay">Winner: </h2>
+             <p class="text-slate-300 text-sm leading-relaxed max-w-2xl relative z-10" id="reasoningDisplay"></p>
+        </div>
+
+        <div class="flex items-center gap-4 mb-8 mt-4">
+            <h3 class="text-xl md:text-2xl font-bold text-white font-heading">Strategic Edge Breakdown</h3>
+            <div class="h-px bg-slate-800 flex-1"></div>
+        </div>
+
+        <div id="comparisonContent" class="grid grid-cols-1 gap-4 relative z-10">
+            <!-- Dynamic Content -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Drag and Drop functionality
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        const inputId = zone.getAttribute('data-input');
+        const input = document.getElementById(inputId);
+        const display = zone.querySelector('.file-name-display');
+
+        zone.addEventListener('click', () => input.click());
+
+        input.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                display.textContent = this.files[0].name;
+                zone.classList.add('border-emerald-500/50', 'bg-emerald-500/5');
+            }
+        });
+
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            zone.classList.add('border-emerald-500/50', 'bg-emerald-500/10');
+        });
+
+        zone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (!input.files.length) {
+                zone.classList.remove('border-emerald-500/50', 'bg-emerald-500/10');
+            }
+        });
+
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('bg-emerald-500/10');
+            if (e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                display.textContent = input.files[0].name;
+                zone.classList.add('border-emerald-500/50', 'bg-emerald-500/5');
+            }
+        });
+    });
+
+    // Form Submission
+    document.getElementById('compareForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const oldFile = document.getElementById('old_resume_input').files[0];
+        const newFile = document.getElementById('new_resume_input').files[0];
+
+        if (!oldFile || !newFile) {
+            alert("Please select both Old and New CVs.");
+            return;
+        }
+
+        const btn = document.getElementById('compareBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        const container = document.getElementById('resultsContainer');
+
+        // UI Loading State
+        btn.disabled = true;
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        btnText.classList.add('hidden');
+        btnLoader.classList.remove('hidden');
+        container.classList.add('hidden');
+
+        const formData = new FormData();
+        formData.append('old_resume', oldFile);
+        formData.append('new_resume', newFile);
+
+        try {
+            const response = await fetch('/compare-resumes', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                const comparison = data.comparison || [];
+                const contentDiv = document.getElementById('comparisonContent');
+                contentDiv.innerHTML = '';
+                
+                document.getElementById('winnerDisplay').innerHTML = `Winner: <span class="text-emerald-300">${data.winner}</span> <i class="fas fa-crown text-yellow-400 ml-2"></i>`;
+                document.getElementById('reasoningDisplay').textContent = data.reasoning;
+
+                comparison.forEach((item, index) => {
+                    // Staggered animation delay
+                    const delay = index * 100;
+                    contentDiv.innerHTML += `
+                        <div class="glass-card p-6 border-l-4 border-l-emerald-500 hover:-translate-y-1 transition-transform duration-300 fade-in shadow-lg flex items-start gap-4" style="animation-delay: ${delay}ms">
+                            <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fas fa-arrow-trend-up text-sm"></i>
+                            </div>
+                            <p class="text-slate-200 leading-relaxed text-sm">${item}</p>
+                        </div>
+                    `;
+                });
+
+                container.classList.remove('hidden');
+                setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+            } else {
+                alert('Comparison Audit Failed: ' + data.error);
+            }
+        } catch (error) {
+            alert('A network error occurred while connecting to the AI Engine.');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            btnText.classList.remove('hidden');
+            btnLoader.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

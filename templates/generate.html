@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Generator - SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 max-w-4xl">
+    <!-- Header -->
+    <div class="text-center mb-16 fade-in">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold mb-6 tracking-wider uppercase">
+            <i class="fas fa-magic"></i> AI Tailoring
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 font-heading tracking-tight">
+            Automated <span
+                class="bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">Optimization</span>
+        </h1>
+        <p class="text-slate-400 max-w-2xl mx-auto leading-relaxed text-lg">
+            Upload your base profile and a target job description. Our neural engine will rewrite your resume to target
+            specific job requirements while maintaining authenticity.
+        </p>
+    </div>
+
+    <div class="glass-card gradient-border p-8 md:p-12 mb-20 fade-in" style="animation-delay: 0.1s">
+        <form id="generateForm" class="space-y-10">
+            <!-- Base Resume Upload -->
+            <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">Initial
+                    Resume Profile (PDF)</label>
+                <div class="drop-zone group border-2 border-dashed border-slate-800 rounded-3xl p-12 text-center hover:border-indigo-500/50 hover:bg-indigo-500/[0.02] transition-all cursor-pointer relative overflow-hidden"
+                    id="dropZone">
+                    <input type="file" name="resume" id="resume" class="hidden" accept=".pdf" required>
+                    <div class="relative z-10">
+                        <div
+                            class="w-20 h-20 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:border-indigo-500/30 transition-all duration-500">
+                            <i class="fas fa-file-pdf text-3xl text-slate-600 group-hover:text-indigo-400"></i>
+                        </div>
+                        <p class="text-slate-300 font-bold text-lg mb-2">Drag & Drop Base File</p>
+                        <p class="text-slate-500 text-sm mb-6">Supported formats: PDF (Maximum 5MB)</p>
+                        <p class="text-indigo-400 font-mono text-sm tracking-tighter" id="fileName">Awaiting
+                            selection...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Description Input -->
+            <div>
+                <label for="job_description"
+                    class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">Target Job
+                    Calibration</label>
+                <textarea name="job_description" id="job_description" rows="8"
+                    class="w-full px-8 py-6 rounded-3xl border border-slate-800 bg-slate-900/50 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all font-sans text-sm resize-none leading-relaxed"
+                    placeholder="Paste the target job description here for AI alignment..."></textarea>
+            </div>
+
+            <!-- Template Selection Grid -->
+            <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6">Select
+                    Presentation Style</label>
+                <input type="hidden" name="template" id="selectedTemplate" value="modern">
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    {% set template_list = [
+                    ('classic', 'Executive Classic', 'executive_classic.png', 'Conservative & high-impact traditional
+                    layout.'),
+                    ('modern', 'Silicon Valley Modern', 'silicon_valley.png', 'Tech-forward, minimalist, and
+                    sidebar-driven.'),
+                    ('creative', 'Artistic Visionary', 'artistic_visionary.png', 'Fluid, creative font-centric
+                    masterpiece.'),
+                    ('zety', 'Corporate Professional', 'corporate_professional.png', 'Rugged, dual-column corporate
+                    structure.'),
+                    ('harrison', 'Bold Impact', 'bold_impact.png', 'Strong colors & typography for leadership.'),
+                    ('elegant', 'Minimalist Elegant', 'minimalist_elegant.png', 'Sleek, monochrome, and sophisticatedly
+                    simple.')
+                    ] %}
+
+                    {% for id, name, img, desc in template_list %}
+                    <div class="template-option group/opt cursor-pointer" onclick="selectTemplate('{{ id }}', this)"
+                        id="opt-{{ id }}">
+                        <div
+                            class="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-slate-800 transition-all duration-300 hover:border-indigo-500/30 opt-container">
+                            <img src="/static/templates/{{ img }}" alt="{{ name }}"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover/opt:scale-110">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent transition-opacity group-hover/opt:opacity-60">
+                            </div>
+                            <div
+                                class="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover/opt:translate-y-[-5px]">
+                                <p class="text-[10px] font-bold text-white uppercase tracking-widest">{{ name }}</p>
+                                <p
+                                    class="text-[8px] text-slate-400 mt-1 opacity-0 group-hover/opt:opacity-100 transition-opacity leading-tight">
+                                    {{ desc }}</p>
+                            </div>
+                            <div
+                                class="selected-overlay absolute inset-0 flex items-center justify-center bg-indigo-600/20 backdrop-blur-[2px] opacity-0 transition-all duration-300">
+                                <div
+                                    class="check-icon w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
+                                    <i class="fas fa-check text-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ATS Mode Checkbox -->
+            <div class="flex items-center gap-4 p-5 bg-indigo-500/5 rounded-2xl border border-indigo-500/10">
+                <div class="relative flex items-center cursor-pointer">
+                    <input id="ats_mode" name="ats_mode" type="checkbox"
+                        class="peer h-6 w-6 opacity-0 absolute cursor-pointer" checked>
+                    <div
+                        class="h-6 w-6 bg-slate-900 border border-slate-800 rounded-lg peer-checked:bg-indigo-600 peer-checked:border-indigo-500 transition-all flex items-center justify-center">
+                        <i class="fas fa-check text-xs text-white opacity-0 peer-checked:opacity-100"></i>
+                    </div>
+                </div>
+                <label for="ats_mode" class="text-sm text-slate-300 font-bold cursor-pointer select-none">
+                    Enable <span class="text-indigo-400">ATS High-Precision</span> Optimization Mode
+                </label>
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" id="generateBtn"
+                    class="w-full btn-premium btn-primary py-5 text-xl relative group">
+                    <div
+                        class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                    </div>
+                    <span id="btnText"
+                        class="flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs font-black">
+                        <i class="fas fa-wand-magic-sparkles text-sm"></i> Generate Strategic Resume
+                    </span>
+                    <span id="loadingText" class="hidden flex items-center justify-center gap-3">
+                        <i class="fas fa-circle-notch fa-spin"></i> Neural Processor Calibrating...
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-option.active .opt-container {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        transform: translateY(-5px);
+    }
+
+    .template-option.active .selected-overlay {
+        opacity: 1 !important;
+    }
+
+    .template-option.active .check-icon {
+        transform: scale(1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const form = document.getElementById('generateForm');
+    const resumeInput = document.getElementById('resume');
+    const dropZone = document.getElementById('dropZone');
+    const fileName = document.getElementById('fileName');
+    const generateBtn = document.getElementById('generateBtn');
+    const btnText = document.getElementById('btnText');
+    const loadingText = document.getElementById('loadingText');
+
+    dropZone.addEventListener('click', () => resumeInput.click());
+
+    resumeInput.addEventListener('change', function () {
+        if (this.files?.[0]) {
+            fileName.textContent = `Attached: ${this.files[0].name}`;
+            dropZone.classList.add('border-indigo-500/50', 'bg-indigo-500/[0.02]');
+        }
+    });
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const file = resumeInput.files[0];
+        const jobDesc = document.getElementById('job_description').value.trim();
+
+        if (!file || !jobDesc) { alert('Base profile and Target JD are required.'); return; }
+
+        generateBtn.disabled = true;
+        btnText.classList.add('hidden');
+        loadingText.classList.remove('hidden');
+        generateBtn.classList.add('opacity-50');
+
+        const formData = new FormData();
+        formData.append('resume', file);
+        formData.append('job_description', jobDesc);
+        formData.append('template', document.getElementById('selectedTemplate').value);
+        if (document.getElementById('ats_mode').checked) formData.append('ats_mode', 'on');
+
+        try {
+            const resp = await fetch('/generate', { method: 'POST', body: formData });
+            const data = await resp.json();
+            if (data.success) window.location.href = data.redirect;
+            else alert('Generation Failure: ' + (data.error || 'Server error'));
+        } catch (err) { alert('Network Sync Failed'); }
+        finally {
+            generateBtn.disabled = false;
+            btnText.classList.remove('hidden');
+            loadingText.classList.add('hidden');
+            generateBtn.classList.remove('opacity-50');
+        }
+    });
+
+    function selectTemplate(id, element) {
+        document.getElementById('selectedTemplate').value = id;
+        document.querySelectorAll('.template-option').forEach(opt => opt.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const defaultOpt = document.getElementById('opt-modern');
+        if (defaultOpt) selectTemplate('modern', defaultOpt);
+    });
+
+    // Drag events
+    ['dragenter', 'dragover'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+            e.preventDefault(); dropZone.classList.add('border-indigo-500/50', 'bg-indigo-500/10');
+        });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+            e.preventDefault(); dropZone.classList.remove('border-indigo-500/50', 'bg-indigo-500/10');
+        });
+    });
+    dropZone.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length) {
+            resumeInput.files = e.dataTransfer.files;
+            fileName.textContent = `Attached: ${resumeInput.files[0].name}`;
+        }
+    });
+</script>
+{% endblock %}

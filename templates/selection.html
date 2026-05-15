@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Choose Role | SmartHire{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 flex items-center justify-center min-h-[80vh]">
+  <div class="max-w-2xl w-full text-center fade-in">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold mb-6 tracking-wider uppercase">
+      <i class="fas fa-rocket"></i> Get Started
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-6 font-heading text-white">
+      Welcome to SmartHire
+    </h1>
+    <p class="text-slate-400 mb-12 text-lg">Select your role to continue.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- User Selection -->
+      <a href="/dashboard" class="group">
+        <div class="glass-card gradient-border p-10 h-full flex flex-col items-center text-center transition-all duration-300 hover:bg-slate-800/50">
+          <div class="w-20 h-20 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(99,102,241,0.2)] group-hover:shadow-[0_0_25px_rgba(99,102,241,0.4)]">
+            <i class="fas fa-user text-4xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-white mb-3">Continue as User</h2>
+          <p class="text-slate-400 text-sm mb-6">Build your resume, practice interviews, and get job matches.</p>
+          <div class="mt-auto">
+            <span class="btn-premium btn-primary group-hover:px-8 transition-all w-full text-center block">
+              User Portal <i class="fas fa-arrow-right ml-2 text-xs opacity-50 group-hover:translate-x-1 transition-transform"></i>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Admin Selection -->
+      <a href="/admin-key-verify" class="group">
+        <div class="glass-card gradient-border p-10 h-full flex flex-col items-center text-center transition-all duration-300 hover:bg-slate-800/50">
+          <div class="w-20 h-20 bg-emerald-600/20 text-emerald-400 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(16,185,129,0.2)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]">
+            <i class="fas fa-user-tie text-4xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-white mb-3">Continue as Admin</h2>
+          <p class="text-slate-400 text-sm mb-6">Manage users, view analytics, and control the platform.</p>
+          <div class="mt-auto">
+            <span class="btn-premium btn-outline border-emerald-500/30 text-emerald-400 group-hover:bg-emerald-500/10 transition-all w-full text-center block uppercase tracking-wider text-xs font-semibold">
+              Admin Portal <i class="fas fa-lock ml-2 text-xs opacity-50"></i>
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
