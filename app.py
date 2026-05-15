@@ -54,14 +54,19 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 client = None
 
+ai_init_error = None
+
 if GROQ_API_KEY and GROQ_API_KEY.strip():
     try:
+        from groq import Groq
         client = Groq(api_key=GROQ_API_KEY)
         print("Groq Client Successfully Initialized.")
     except Exception as e:
+        ai_init_error = str(e)
         print(f"CRITICAL: Failed to initialize Groq client: {e}")
 else:
-    print("CRITICAL: GROQ_API_KEY not found or empty in environment variables.")
+    ai_init_error = "GROQ_API_KEY not found in environment variables."
+    print(f"CRITICAL: {ai_init_error}")
 
 # Ensure directories exist (handle potential OS errors in serverless)
 try:
@@ -76,7 +81,40 @@ except Exception as e:
 def inject_ai_status():
     return dict(ai_ready=(client is not None))
 
+
+
+# ============================================================================
+# UNIFIED AI HELPER
+# ============================================================================
+
+def get_ai_completion(prompt, system_message="You are a helpful assistant.", temperature=0.1, max_tokens=4096, is_json=False):
+    """Helper to call Groq AI"""
+    if client:
+        try:
+            extra_params = {}
+            if is_json:
+                extra_params["response_format"] = {"type": "json_object"}
+            
+            completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+                **extra_params
+            )
+            return completion.choices[0].message.content
+        except Exception as e:
+            print(f"Groq API Error: {e}")
+            raise e
+
+    raise Exception("Groq AI provider is not available.")
+
+
 # In-memory storage for analysis results (use database in production)
+
 analysis_storage = {}
 
 def get_writable_path(filename):
@@ -161,8 +199,12 @@ def health_check():
         "status": "healthy",
         "vercel": IS_VERCEL,
         "groq_ready": client is not None,
+        "ai_error": ai_init_error,
         "timestamp": datetime.now().isoformat()
     })
+
+
+
 
 @app.route('/subscription')
 @login_required
@@ -369,23 +411,19 @@ Provide only valid JSON, no additional text or explanation.
 IMPORTANT: Ensure valid JSON output.
 """
 
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that outputs only valid JSON."},
-                {"role": "user", "content": prompt}
-            ],
+        content = get_ai_completion(
+            prompt=prompt,
+            system_message="You are a helpful assistant that outputs only valid JSON.",
             temperature=0.1,
             max_tokens=4096,
-            top_p=1,
-            stream=False,
-            response_format={"type": "json_object"}
+            is_json=True
         )
-
-        return clean_json_response(completion.choices[0].message.content)
+        return clean_json_response(content)
 
     except Exception as e:
-        raise Exception(f"Groq API analysis failed: {str(e)}")
+        raise Exception(f"AI analysis failed: {str(e)}")
+
+
 
 
 def generate_enhanced_pdf(analysis_data, original_text):
@@ -596,23 +634,21 @@ def generate_custom_resume(resume_text, target_job_description):
         }}
         Provide only valid JSON.
         """
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a resume expert that outputs valid JSON."},
-                {"role": "user", "content": prompt}
-            ],
+        print("[DEBUG] Calling AI for resume generation...")
+        content = get_ai_completion(
+            prompt=prompt,
+            system_message="You are a resume expert that outputs valid JSON.",
             temperature=0.5,
             max_tokens=4096,
-            stream=False,
-            response_format={"type": "json_object"}
+            is_json=True
         )
-        print("[DEBUG] Groq API response received.")
-        return clean_json_response(completion.choices[0].message.content)
+        print("[DEBUG] AI response received.")
+        return clean_json_response(content)
 
     except Exception as e:
         print(f"Resume Gen Error: {e}")
         raise Exception(f"Resume generation failed: {str(e)}")
+
 
 def analyze_job_description_with_ai(job_description):
     """
@@ -645,20 +681,19 @@ Provide a comprehensive analysis in valid JSON format with the following structu
 }}
 Provide only valid JSON.
 """
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that outputs only valid JSON."},
-                {"role": "user", "content": prompt}
-            ],
+        content = get_ai_completion(
+            prompt=prompt,
+            system_message="You are a helpful assistant that outputs only valid JSON.",
             temperature=0.1,
             max_tokens=2048,
-            response_format={"type": "json_object"}
+            is_json=True
         )
-        return clean_json_response(completion.choices[0].message.content)
+        return clean_json_response(content)
     except Exception as e:
         print(f"JD Analysis Error: {e}")
         raise Exception(f"JD Analysis failed: {str(e)}")
+
+
 
 def rewrite_resume_section(text, improvement_type="Professional"):
     """
@@ -684,18 +719,17 @@ Specific Instructions for {improvement_type}:
 
 Provide the improved text. Do not include explanations, just the rewritten content.
 """
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a helpful editor."},
-                {"role": "user", "content": prompt}
-            ],
+        return get_ai_completion(
+            prompt=prompt,
+            system_message="You are a helpful editor.",
             temperature=0.3,
-            max_tokens=1024
+            max_tokens=1024,
+            is_json=False
         )
-        return completion.choices[0].message.content.strip()
     except Exception as e:
         raise Exception(f"Content rewrite failed: {str(e)}")
+
+
 
 def generate_two_column_pdf(resume_data, accent_color=teal):
     """Generate a Two-Column Modern PDF Resume with Pagination Fix and Full Bleed"""
@@ -2008,7 +2042,7 @@ def chat():
             return jsonify({'error': 'No message provided'}), 400
 
         if not client:
-            return jsonify({'error': 'Groq client not initialized'}), 500
+            return jsonify({'error': 'AI services are currently offline.'}), 500
 
         # Context for the AI
         system_context = """
@@ -2032,20 +2066,18 @@ def chat():
         - Focus: Politely redirect non-career topics back to professional development.
         """
         
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": system_context},
-                {"role": "user", "content": user_message}
-            ],
+        response_text = get_ai_completion(
+            prompt=user_message,
+            system_message=system_context,
             temperature=0.7,
             max_tokens=1024,
-            stream=False
+            is_json=False
         )
         
         return jsonify({
-            'response': completion.choices[0].message.content
+            'response': response_text
         })
+
 
     except Exception as e:
         print(f"Chat error: {e}")
@@ -2348,7 +2380,7 @@ def market_demand():
                 return jsonify({'error': 'Please provide a job role.'}), 400
 
             if not client:
-                return jsonify({'error': 'Groq client not initialized'}), 500
+                return jsonify({'error': 'AI services are currently offline.'}), 500
 
             prompt = f"""
             You are a leading Market Research Analyst specialized in the Global Tech Job Market. 
@@ -2369,19 +2401,17 @@ def market_demand():
             Provide ONLY valid JSON.
             """
             
-            completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": "You are a market analyst that outputs valid JSON."},
-                    {"role": "user", "content": prompt}
-                ],
+            response_text = get_ai_completion(
+                prompt=prompt,
+                system_message="You are a market analyst that outputs valid JSON.",
                 temperature=0.7,
                 max_tokens=1024,
-                response_format={"type": "json_object"}
+                is_json=True
             )
             
-            analysis = clean_json_response(completion.choices[0].message.content)
+            analysis = clean_json_response(response_text)
             return jsonify({'success': True, 'analysis': analysis})
+
 
         except Exception as e:
             print(f"Market Demand Error: {e}")
@@ -2394,8 +2424,6 @@ def generate_summary_ai(skills, experience):
     Generate a professional resume summary from skills and experience
     """
     try:
-        if not client: raise Exception("Groq client not initialized")
-
         prompt = f"""
 You are an expert resume writer. Generate a concise, high-impact professional summary (3-4 sentences) based on the following skills and experience.
 
@@ -2410,16 +2438,15 @@ Guidelines:
 
 Provide only the summary text, no introduction or conclusion.
 """
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a professional resume writer."},
-                {"role": "user", "content": prompt}
-            ],
+        return get_ai_completion(
+            prompt=prompt,
+            system_message="You are a professional resume writer.",
             temperature=0.7,
-            max_tokens=512
+            max_tokens=512,
+            is_json=False
         )
-        return completion.choices[0].message.content.strip()
+
+
     except Exception as e:
         raise Exception(f"Summary generation failed: {str(e)}")
 
@@ -2619,7 +2646,7 @@ def compare_resumes():
             new_text = extract_text_from_pdf(new_filepath)
             
             if not client:
-                return jsonify({'error': 'Groq client not initialized'}), 500
+                return jsonify({'error': 'AI services are currently offline.'}), 500
 
             prompt = f"""
             You are an expert Resume Reviewer. Compare the "Old Resume" with the "New Resume".
@@ -2648,18 +2675,16 @@ def compare_resumes():
             }}
             """
             
-            completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": "You are a resume analysis API that outputs valid JSON."},
-                    {"role": "user", "content": prompt}
-                ],
+            response_text = get_ai_completion(
+                prompt=prompt,
+                system_message="You are a resume analysis API that outputs valid JSON.",
                 temperature=0.5,
                 max_tokens=800,
-                response_format={"type": "json_object"}
+                is_json=True
             )
             
-            analysis = clean_json_response(completion.choices[0].message.content)
+            analysis = clean_json_response(response_text)
+
             return jsonify({
                 'success': True, 
                 'comparison': analysis.get('comparison', []),
@@ -2780,7 +2805,7 @@ def interview_questions():
                 num_questions = 2 # Enforce limit for free users
                 
             if not client:
-                 return jsonify({'error': 'Groq client not initialized'}), 500
+                 return jsonify({'error': 'AI services are currently offline.'}), 500
                  
             prompt = f"""
             You are an expert HR Manager and Technical Interviewer. 
@@ -2805,19 +2830,17 @@ def interview_questions():
             Provide only the valid JSON.
             """
             
-            completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": "You are an interview question generator that outputs only valid JSON."},
-                    {"role": "user", "content": prompt}
-                ],
+            response_text = get_ai_completion(
+                prompt=prompt,
+                system_message="You are an interview question generator that outputs only valid JSON.",
                 temperature=0.7,
                 max_tokens=1500,
-                response_format={"type": "json_object"}
+                is_json=True
             )
             
-            result = clean_json_response(completion.choices[0].message.content)
+            result = clean_json_response(response_text)
             return jsonify({'success': True, 'questions': result})
+
             
         except Exception as e:
             import traceback
@@ -2851,7 +2874,7 @@ def generate_roadmap():
             return jsonify({'error': 'Target Job Role is required.'}), 400
             
         if not client:
-            return jsonify({'error': 'Groq client not initialized'}), 500
+            return jsonify({'error': 'AI services are currently offline.'}), 500
             
         prompt = f"""
         You are an elite Career Coach. The user wants a step-by-step roadmap to become a "{role}".
@@ -2876,19 +2899,17 @@ def generate_roadmap():
         }}
         """
         
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a career map generator that outputs valid JSON."},
-                {"role": "user", "content": prompt}
-            ],
+        response_text = get_ai_completion(
+            prompt=prompt,
+            system_message="You are a career map generator that outputs valid JSON.",
             temperature=0.5,
             max_tokens=1500,
-            response_format={"type": "json_object"}
+            is_json=True
         )
         
-        analysis = clean_json_response(completion.choices[0].message.content)
+        analysis = clean_json_response(response_text)
         return jsonify({'success': True, 'roadmap': analysis.get('roadmap', [])})
+
         
     except Exception as e:
         import traceback
