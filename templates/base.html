@@ -348,6 +348,51 @@
   </div>
 
   <script>
+    // Performance & Stability Guard: Equivalent to React's route protection
+    (function() {
+        let initCount = 0;
+        const maxInit = 1;
+
+        function initializeApp() {
+            if (initCount >= maxInit) return;
+            initCount++;
+
+            // Ensure body visibility (Equivalent to clearing a Black Screen)
+            const body = document.getElementById("body");
+            if (body) {
+                body.style.display = "block";
+                body.style.opacity = "1";
+                body.classList.add("dark-mode");
+            }
+            
+            console.log("SmartHire Core Initialized Successfully.");
+        }
+
+        // Navigation Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (nav) {
+                if (window.scrollY > 50) {
+                    nav.classList.add('py-2');
+                    nav.classList.remove('py-3');
+                } else {
+                    nav.classList.add('py-3');
+                    nav.classList.remove('py-2');
+                }
+            }
+        });
+
+        // Initialize on DOM Ready (Equivalent to useEffect([], []))
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // Safety Timeout (Force render after 3s if DOMContentLoaded hangs)
+        setTimeout(initializeApp, 3000);
+    })();
+
     function showPremiumModal() {
         document.getElementById('premium-modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -356,26 +401,7 @@
         document.getElementById('premium-modal').classList.add('hidden');
         document.body.style.overflow = '';
     }
-
-    // Navigation Scroll Effect
-    window.addEventListener('scroll', () => {
-      const nav = document.querySelector('nav');
-      if (window.scrollY > 50) {
-        nav.classList.add('py-2');
-        nav.classList.remove('py-3');
-      } else {
-        nav.classList.add('py-3');
-        nav.classList.remove('py-2');
-      }
-    });
-
-    // Dark Mode LocalStorage management (Keeping it for future toggle, but setting default to dark)
-    document.addEventListener("DOMContentLoaded", function () {
-      // Default to premium dark theme
-      document.getElementById("body").classList.add("dark-mode");
-    });
   </script>
-
 
   {% block extra_js %}{% endblock %}
 </body>

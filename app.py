@@ -103,6 +103,7 @@ def get_ai_completion(prompt, system_message="You are a helpful assistant.", tem
                 ],
                 temperature=temperature,
                 max_tokens=max_tokens,
+                timeout=25.0,
                 **extra_params
             )
             return completion.choices[0].message.content
@@ -2506,7 +2507,8 @@ def suggest_skills():
                 ],
                 temperature=0.7,
                 max_tokens=500,
-                response_format={"type": "json_object"}
+                response_format={"type": "json_object"},
+                timeout=25.0
             )
             
             analysis = clean_json_response(completion.choices[0].message.content)
