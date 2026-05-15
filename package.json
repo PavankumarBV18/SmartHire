@@ -2,6 +2,7 @@
   "name": "smarthire-ui",
   "version": "1.0.0",
   "scripts": {
+    "build": "npm run vercel-build",
     "vercel-build": "npx tailwindcss -i ./static/css/globals.css -o ./static/css/tailwind_dist.css --minify"
   },
 
