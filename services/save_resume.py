@@ -3,7 +3,20 @@ import os
 import uuid
 from datetime import datetime
 
-RESUMES_FILE = "saved_resumes.json"
+def get_writable_path(filename):
+    is_vercel = os.getenv('VERCEL') == '1'
+    if is_vercel:
+        tmp_path = os.path.join('/tmp', filename)
+        if not os.path.exists(tmp_path) and os.path.exists(filename):
+             try:
+                 import shutil
+                 shutil.copy2(filename, tmp_path)
+             except:
+                 pass
+        return tmp_path
+    return filename
+
+RESUMES_FILE = get_writable_path("saved_resumes.json")
 
 def load_saved_resumes():
     if not os.path.exists(RESUMES_FILE):
@@ -11,12 +24,16 @@ def load_saved_resumes():
     try:
         with open(RESUMES_FILE, "r") as f:
             return json.load(f)
-    except json.JSONDecodeError:
+    except Exception as e:
+        print(f"Error loading resumes: {e}")
         return []
 
 def save_resumes_data(data):
-    with open(RESUMES_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+    try:
+        with open(RESUMES_FILE, "w") as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        print(f"Error saving resumes: {e}")
 
 def save_resume(email, resume_name, skills, ats_score, file_path):
     if not email:

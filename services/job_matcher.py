@@ -1,7 +1,23 @@
 import json
 import os
 
-def load_jobs(filepath="jobs.json"):
+def get_writable_path(filename):
+    import os
+    is_vercel = os.getenv('VERCEL') == '1'
+    if is_vercel:
+        tmp_path = os.path.join('/tmp', filename)
+        # If file doesn't exist in /tmp, try to copy it from original location if it exists
+        if not os.path.exists(tmp_path) and os.path.exists(filename):
+             try:
+                 import shutil
+                 shutil.copy2(filename, tmp_path)
+             except:
+                 pass
+        return tmp_path
+    return filename
+
+def load_jobs(filepath=None):
+    if filepath is None: filepath = get_writable_path("jobs.json")
     if not os.path.exists(filepath):
         # Default jobs if file doesn't exist
         default_jobs = [
@@ -9,20 +25,29 @@ def load_jobs(filepath="jobs.json"):
             {"title": "Data Analyst", "company": "Tech Corp", "skills": ["SQL", "Python", "Excel"]},
             {"title": "Frontend Developer", "company": "Web Solutions", "skills": ["HTML", "CSS", "JavaScript"]}
         ]
-        with open(filepath, "w") as f:
-            json.dump(default_jobs, f, indent=4)
+        try:
+            with open(filepath, "w") as f:
+                json.dump(default_jobs, f, indent=4)
+        except:
+            pass # Handle read-only errors gracefully
         return default_jobs
     try:
         with open(filepath, "r") as f:
             return json.load(f)
-    except json.JSONDecodeError:
+    except Exception as e:
+        print(f"Error loading jobs: {e}")
         return []
 
-def save_jobs(jobs, filepath="jobs.json"):
-    with open(filepath, "w") as f:
-        json.dump(jobs, f, indent=4)
+def save_jobs(jobs, filepath=None):
+    if filepath is None: filepath = get_writable_path("jobs.json")
+    try:
+        with open(filepath, "w") as f:
+            json.dump(jobs, f, indent=4)
+    except Exception as e:
+        print(f"Error saving jobs: {e}")
 
-def add_job_and_notify(title, company, skills, description="", location="", apply_link="", filepath="jobs.json"):
+def add_job_and_notify(title, company, skills, description="", location="", apply_link="", filepath=None):
+    if filepath is None: filepath = get_writable_path("jobs.json")
     jobs = load_jobs(filepath)
     new_job = {"title": title, "company": company, "skills": skills, "description": description, "location": location, "apply_link": apply_link}
     jobs.append(new_job)
@@ -48,7 +73,8 @@ def add_job_and_notify(title, company, skills, description="", location="", appl
                 threading.Thread(target=send_job_alert_email, args=(email, new_job, matched), daemon=True).start()
     return new_job
 
-def update_job_and_notify(index, title, company, skills, description="", location="", apply_link="", filepath="jobs.json"):
+def update_job_and_notify(index, title, company, skills, description="", location="", apply_link="", filepath=None):
+    if filepath is None: filepath = get_writable_path("jobs.json")
     jobs = load_jobs(filepath)
     if index < 0 or index >= len(jobs):
         raise ValueError("Invalid job index")
@@ -77,7 +103,8 @@ def update_job_and_notify(index, title, company, skills, description="", locatio
                 threading.Thread(target=send_job_alert_email, args=(email, updated_job, matched), daemon=True).start()
     return updated_job
 
-def delete_job(index, filepath="jobs.json"):
+def delete_job(index, filepath=None):
+    if filepath is None: filepath = get_writable_path("jobs.json")
     jobs = load_jobs(filepath)
     if 0 <= index < len(jobs):
         del jobs[index]
@@ -111,20 +138,27 @@ def match_jobs(user_skills):
             
     return matched_results
 
-def load_users(filepath="users.json"):
+def load_users(filepath=None):
+    if filepath is None: filepath = get_writable_path("users.json")
     if not os.path.exists(filepath):
         return []
     try:
         with open(filepath, "r") as f:
             return json.load(f)
-    except json.JSONDecodeError:
+    except Exception as e:
+        print(f"Error loading users: {e}")
         return []
 
-def save_users(users, filepath="users.json"):
-    with open(filepath, "w") as f:
-        json.dump(users, f, indent=4)
+def save_users(users, filepath=None):
+    if filepath is None: filepath = get_writable_path("users.json")
+    try:
+        with open(filepath, "w") as f:
+            json.dump(users, f, indent=4)
+    except Exception as e:
+        print(f"Error saving users: {e}")
 
-def add_user(email, skills, filepath="users.json"):
+def add_user(email, skills, filepath=None):
+    if filepath is None: filepath = get_writable_path("users.json")
     if not email:
         return None
         

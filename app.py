@@ -41,8 +41,13 @@ load_dotenv(override=True)
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['ANALYSIS_FOLDER'] = 'analysis_data'
+
+# Vercel Compatibility: Use /tmp for writable directories
+IS_VERCEL = os.getenv('VERCEL') == '1'
+BASE_DIR = '/tmp' if IS_VERCEL else os.getcwd()
+
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
+app.config['ANALYSIS_FOLDER'] = os.path.join(BASE_DIR, 'analysis_data')
 app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
 
 # Configure Groq AI
@@ -57,10 +62,15 @@ if GROQ_API_KEY and GROQ_API_KEY.strip():
         print(f"CRITICAL: Failed to initialize Groq client: {e}")
 else:
     print("CRITICAL: GROQ_API_KEY not found or empty in environment variables.")
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['ANALYSIS_FOLDER'], exist_ok=True)
-os.makedirs('static', exist_ok=True)
-os.makedirs('templates', exist_ok=True)
+
+# Ensure directories exist (handle potential OS errors in serverless)
+try:
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['ANALYSIS_FOLDER'], exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, 'templates'), exist_ok=True)
+except Exception as e:
+    print(f"Warning: Could not create directories: {e}")
 
 @app.context_processor
 def inject_ai_status():
@@ -68,6 +78,19 @@ def inject_ai_status():
 
 # In-memory storage for analysis results (use database in production)
 analysis_storage = {}
+
+def get_writable_path(filename):
+    """Helper to get writable path for serverless environments"""
+    if IS_VERCEL:
+        # If it's a relative path in root, move to /tmp
+        if not os.path.isabs(filename):
+            # Check if it belongs to a folder we've already redirected
+            if filename.startswith('uploads'):
+                return os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(filename))
+            if filename.startswith('analysis_data'):
+                return os.path.join(app.config['ANALYSIS_FOLDER'], os.path.basename(filename))
+            return os.path.join('/tmp', filename)
+    return filename
 
 # ============================================================================
 # UTILITY FUNCTIONS
@@ -120,6 +143,26 @@ def admin_required(f):
 
 
 
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    import traceback
+    print(f"DEBUG: 500 Error: {error}")
+    traceback.print_exc()
+    return render_template('500.html'), 500
+
+@app.route('/health')
+def health_check():
+    return jsonify({
+        "status": "healthy",
+        "vercel": IS_VERCEL,
+        "groq_ready": client is not None,
+        "timestamp": datetime.now().isoformat()
+    })
 
 @app.route('/subscription')
 @login_required
@@ -2091,7 +2134,7 @@ def submit_feedback():
             'page': data.get('page', 'unknown')
         }
         
-        feedback_file = 'feedback.json'
+        feedback_file = get_writable_path('feedback.json')
         
         # Load existing feedback
         existing_feedback = []
@@ -2215,7 +2258,7 @@ def analyze_jd():
             
             # Save analysis
             jd_id = str(uuid.uuid4())
-            jd_file = os.path.join(app.config['ANALYSIS_FOLDER'], f"jd_{jd_id}.json")
+            jd_file = get_writable_path(os.path.join(app.config['ANALYSIS_FOLDER'], f"jd_{jd_id}.json"))
             with open(jd_file, 'w') as f:
                 json.dump(analysis_result, f)
             
