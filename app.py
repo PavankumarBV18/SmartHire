@@ -210,7 +210,6 @@ def health_check():
 @login_required
 def subscription():
     user = get_current_user()
-    session.pop('just_logged_in', None) # Clear tutorial flag if they navigate away
     return render_template('subscription.html', user=user)
 
 @app.route('/upgrade', methods=['POST'])
@@ -1586,9 +1585,7 @@ def admin_dashboard():
         jobs=jobs,
         enumerated_jobs=list(enumerate(jobs)),
         users=users,
-        history=history,
-        feedback=feedback,
-        show_tutorial=session.pop('just_logged_in', None)
+        history=history
     )
 
 @app.route("/admin-job-alert")
@@ -1734,8 +1731,7 @@ def admin_login():
 @login_required
 def dashboard():
     """User Central Dashboard"""
-    show_tut = session.pop('just_logged_in', None)
-    return render_template('user_dashboard.html', show_tutorial=show_tut)
+    return render_template('user_dashboard.html')
 
 @app.route('/home')
 def home():
@@ -2027,61 +2023,6 @@ def too_large(e):
 
 
 # ============================================================================
-# CHATBOT ROUTE
-# ============================================================================
-
-@app.route('/chat', methods=['POST'])
-@login_required
-def chat():
-    """Handle Chatbot Requests"""
-    try:
-        data = request.json
-        user_message = data.get('message', '')
-        
-        if not user_message:
-            return jsonify({'error': 'No message provided'}), 400
-
-        if not client:
-            return jsonify({'error': 'AI services are currently offline.'}), 500
-
-        # Context for the AI
-        system_context = """
-        You are the "SmartHire Neural Career Architect", a sophisticated AI career coach.
-        You are embedded in the SmartHire platform, which provides:
-        1. Deep ATS Compatibility Scoring (0-100).
-        2. Granular Match Analysis (Hard Skills, Soft Skills, Keyword Coverage).
-        3. Skill Gap Detection & Learning Path Recommendations.
-        4. Predicted Career Pathways (Predicting roles based on resume).
-        5. ATS Structural Audits (Detecting tables, icons, and non-standard fonts).
-
-        Your goal is to provide high-impact, data-driven career advice. 
-        When users ask about:
-        - "Why is my ATS score low?": Explain common pitfalls like poor keyword density, structural issues (tables/icons), or skill gaps.
-        - "How can I improve?": Suggest quantitative achievements, better action verbs, and addressing specific missing skills.
-        - "What skills should I add?": Refer to industry trends and matching the resume to specific job descriptions.
-
-        Persona Guidelines:
-        - Analytical & Encouraging: Use data-backed reasoning but remain supportive.
-        - Concise: Give actionable "Bullet Point" advice where possible.
-        - Focus: Politely redirect non-career topics back to professional development.
-        """
-        
-        response_text = get_ai_completion(
-            prompt=user_message,
-            system_message=system_context,
-            temperature=0.7,
-            max_tokens=1024,
-            is_json=False
-        )
-        
-        return jsonify({
-            'response': response_text
-        })
-
-
-    except Exception as e:
-        print(f"Chat error: {e}")
-        return jsonify({'error': 'Sorry, I am having trouble thinking right now. Please try again.'}), 500
 
 
 # ============================================================================
@@ -2146,49 +2087,6 @@ def cleanup_old_files():
         print(f"Cleanup error: {e}")
 
 
-# ============================================================================
-# FEEDBACK ROUTE
-# ============================================================================
-
-@app.route('/feedback', methods=['POST'])
-def submit_feedback():
-    """Handle User Feedback Submission"""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-            
-        feedback_entry = {
-            'id': str(uuid.uuid4()),
-            'timestamp': datetime.now().isoformat(),
-            'rating': data.get('rating'),
-            'comment': data.get('comment', '').strip(),
-            'page': data.get('page', 'unknown')
-        }
-        
-        feedback_file = get_writable_path('feedback.json')
-        
-        # Load existing feedback
-        existing_feedback = []
-        if os.path.exists(feedback_file):
-            try:
-                with open(feedback_file, 'r') as f:
-                    existing_feedback = json.load(f)
-            except:
-                pass # Start fresh if file is corrupt
-        
-        # Append new feedback
-        existing_feedback.append(feedback_entry)
-        
-        # Save back to file
-        with open(feedback_file, 'w') as f:
-            json.dump(existing_feedback, f, indent=2)
-            
-        return jsonify({'success': True, 'message': 'Thank you for your feedback!'})
-        
-    except Exception as e:
-        print(f"Feedback error: {e}")
-        return jsonify({'error': 'Failed to submit feedback'}), 500
 
 @app.route('/api/add_job', methods=['POST'])
 def add_job_route():

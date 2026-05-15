@@ -53,7 +53,7 @@
             </div>
         </a>
         <!-- Resume Analysis (ATS) -->
-        <a href="/upload-home" id="upload-card-step" class="group">
+        <a href="/upload-home" class="group">
             <div class="glass-card p-8 h-full border-indigo-500/10 hover:border-indigo-500/30 transition-all duration-300">
                 <div class="w-14 h-14 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
                     <i class="fas fa-file-invoice text-2xl"></i>
@@ -100,7 +100,7 @@
         </a>
 
         <!-- Resume History -->
-        <a href="/saved-resumes" id="nav-skill-engine" class="group">
+        <a href="/saved-resumes" class="group">
             <div class="glass-card p-8 h-full border-blue-500/10 hover:border-blue-500/30 transition-all duration-300">
                 <div class="w-14 h-14 bg-blue-600/20 text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
                     <i class="fas fa-bell text-2xl"></i>
@@ -114,7 +114,7 @@
         </a>
 
         <!-- Career Roadmap (Premium - LOCKED) -->
-        <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/roadmap{% else %}javascript:showPremiumModal(){% endif %}" id="nav-roadmap" class="group">
+        <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/roadmap{% else %}javascript:showPremiumModal(){% endif %}" class="group">
             <div class="glass-card p-8 h-full border-purple-500/10 hover:border-purple-500/30 transition-all duration-300 relative overflow-hidden">
                 {% if session.get('plan') == 'free' and session.get('role') != 'admin' %}
                 <div class="absolute top-4 right-4 px-2 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-400 text-[10px] font-black uppercase tracking-widest rounded flex items-center gap-1">
@@ -147,19 +147,6 @@
             </div>
         </a>
 
-        <!-- Voice Assistant (FREE) -->
-        <a href="javascript:toggleChat()" class="group">
-            <div class="glass-card p-8 h-full border-red-500/10 hover:border-red-500/30 transition-all duration-300 relative overflow-hidden">
-                <div class="w-14 h-14 bg-red-600/20 text-red-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                    <i class="fas fa-microphone-lines text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-3">Voice Assistant</h3>
-                <p class="text-slate-400 text-sm mb-6">Talk to our AI career assistant using voice commands to get instant advice.</p>
-                <div class="flex items-center text-red-400 text-xs font-bold uppercase tracking-widest gap-2">
-                    Start Speaking <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </div>
-        </a>
 
         <!-- Resume Comparison (Premium - LOCKED) -->
         <a href="{% if session.get('plan') == 'premium' or session.get('role') == 'admin' %}/compare-resumes{% else %}javascript:showPremiumModal(){% endif %}" class="group">
