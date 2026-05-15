@@ -3,6 +3,7 @@ module.exports = {
     content: [
         "./templates/**/*.html",
         "./static/**/*.js",
+        "./static/**/*.css",
     ],
     theme: {
         extend: {
@@ -18,5 +19,13 @@ module.exports = {
             },
         },
     },
+    safelist: [
+        {
+            pattern: /(bg|text|border)-(indigo|emerald|amber|red|blue|slate)-(400|500|600)/,
+            variants: ['hover', 'focus', 'group-hover'],
+        },
+        'status-online',
+        'status-offline',
+    ],
     plugins: [],
-}
+}

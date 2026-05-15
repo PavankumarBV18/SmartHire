@@ -19,8 +19,7 @@
   <!-- Intro.js CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
   
-  <!-- Global Custom Styles -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
+  <!-- Global Custom Styles (Backup for standalone styles not in Tailwind) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorial.css') }}">
 
   <!-- Chart.js for visualizations -->
@@ -59,9 +58,18 @@
             sans: ['Inter', 'sans-serif'],
           }
         }
-      }
+      },
+      safelist: [
+        {
+          pattern: /(bg|text|border)-(indigo|emerald|amber|red|blue|slate)-(400|500|600)/,
+          variants: ['hover', 'focus', 'group-hover'],
+        },
+        'status-online',
+        'status-offline',
+      ]
     }
   </script>
+
 
   {% block extra_css %}{% endblock %}
 </head>

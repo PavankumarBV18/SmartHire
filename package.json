@@ -2,8 +2,9 @@
   "name": "smarthire-ui",
   "version": "1.0.0",
   "scripts": {
-    "build": "tailwindcss -i ./static/css/globals.css -o ./static/css/tailwind_dist.css --minify"
+    "vercel-build": "npx tailwindcss -i ./static/css/globals.css -o ./static/css/tailwind_dist.css --minify"
   },
+
   "devDependencies": {
     "tailwindcss": "^3.4.1",
     "autoprefixer": "^10.4.17",

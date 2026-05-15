@@ -3,6 +3,6 @@
 npm install
 
 # Build Tailwind CSS
-npm run build
+npm run vercel-build
 
 # Any other build steps...
