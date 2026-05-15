@@ -13,8 +13,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS Static -->
+  <!-- Performance & Safety Guard: Use Pre-compiled Tailwind only in production -->
+  <!-- Removing CDN to prevent blocking and potential infinite JS execution hangs -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind_dist.css') }}">
+    
+  <style>
+      /* Immediate Visibility Guard */
+      body { 
+          display: block !important; 
+          opacity: 1 !important; 
+          background-color: #020617; 
+      }
+  </style>
 
   <!-- Global Custom Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
@@ -26,31 +36,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 
-  <!-- Tailwind CDN Fallback (Ensures UI renders even if static build fails) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            indigo: { 500: '#6366f1', 600: '#4f46e5' },
-          },
-          fontFamily: {
-            heading: ['Outfit', 'sans-serif'],
-            sans: ['Inter', 'sans-serif'],
-          }
-        }
-      },
-      safelist: [
-        {
-          pattern: /(bg|text|border)-(indigo|emerald|amber|red|blue|slate)-(400|500|600)/,
-          variants: ['hover', 'focus', 'group-hover'],
-        },
-        'status-online',
-        'status-offline',
-      ]
+  <!-- Relying on Static Tailwind Dist for Production Performance -->
+  <style>
+    :root {
+      --primary: #6366f1;
+      --secondary: #10b981;
     }
-  </script>
+  </style>
 
 
   {% block extra_css %}{% endblock %}
