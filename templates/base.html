@@ -14,8 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Performance & Safety Guard: Use Pre-compiled Tailwind only in production -->
-  <!-- Removing CDN to prevent blocking and potential infinite JS execution hangs -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind_dist.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     
   <style>
       /* Immediate Visibility Guard */
@@ -25,9 +24,6 @@
           background-color: #020617; 
       }
   </style>
-
-  <!-- Global Custom Styles -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
 
   <!-- Chart.js for visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
