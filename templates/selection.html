@@ -3,44 +3,66 @@
 {% block title %}Welcome - Choose Role | SmartHire{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-6 flex items-center justify-center min-h-[80vh]">
-  <div class="max-w-2xl w-full text-center fade-in">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold mb-6 tracking-wider uppercase">
-      <i class="fas fa-rocket"></i> Get Started
+<div class="container mx-auto px-6 flex items-center justify-center min-h-[75vh]">
+  <div class="max-w-4xl w-full text-center fade-in">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black mb-8 tracking-[0.2em] uppercase">
+      <i class="fas fa-sparkles text-[10px]"></i> AI Powered Experience
     </div>
-    <h1 class="text-4xl md:text-5xl font-bold mb-6 font-heading text-white">
-      Welcome to SmartHire
+    
+    <h1 class="text-4xl md:text-6xl font-black mb-6 font-heading text-white tracking-tight leading-tight">
+      Elevate Your <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent animate-gradient">Career Strategy</span>
     </h1>
-    <p class="text-slate-400 mb-12 text-lg">Select your role to continue.</p>
+    
+    <p class="text-slate-400 mb-16 text-lg md:text-xl max-w-xl mx-auto font-light leading-relaxed">
+      Welcome to the future of recruitment. Select your specialized portal to begin your journey.
+    </p>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14">
       <!-- User Selection -->
-      <a href="/dashboard" class="group">
-        <div class="glass-card gradient-border p-10 h-full flex flex-col items-center text-center transition-all duration-300 hover:bg-slate-800/50">
-          <div class="w-20 h-20 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(99,102,241,0.2)] group-hover:shadow-[0_0_25px_rgba(99,102,241,0.4)]">
-            <i class="fas fa-user text-4xl"></i>
+      <a href="/dashboard" class="group relative">
+        <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+        <div class="glass-card relative p-10 md:p-12 h-full flex flex-col items-center text-center transition-all duration-500 hover:-translate-y-2 border border-white/5 hover:border-indigo-500/30 overflow-hidden">
+          <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+            <i class="fas fa-user text-9xl"></i>
           </div>
-          <h2 class="text-2xl font-bold text-white mb-3">Continue as User</h2>
-          <p class="text-slate-400 text-sm mb-6">Build your resume, practice interviews, and get job matches.</p>
-          <div class="mt-auto">
-            <span class="btn-premium btn-primary group-hover:px-8 transition-all w-full text-center block">
-              User Portal <i class="fas fa-arrow-right ml-2 text-xs opacity-50 group-hover:translate-x-1 transition-transform"></i>
+          
+          <div class="w-24 h-24 bg-indigo-600/10 text-indigo-400 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-700 shadow-[0_0_30px_rgba(99,102,241,0.15)] group-hover:shadow-[0_0_40px_rgba(99,102,241,0.3)] border border-indigo-500/20">
+            <i class="fas fa-user-astronaut text-4xl"></i>
+          </div>
+          
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">Candidate Portal</h2>
+          <p class="text-slate-400 text-sm md:text-base mb-8 font-light leading-relaxed">
+            Optimize your profile, simulate high-stakes interviews, and land your dream role with AI precision.
+          </p>
+          
+          <div class="mt-auto w-full">
+            <span class="btn-premium btn-primary py-4 group-hover:px-10 transition-all w-full text-center block rounded-2xl text-sm font-bold uppercase tracking-widest shadow-xl shadow-indigo-500/20">
+              Enter Portal <i class="fas fa-arrow-right ml-2 text-[10px] group-hover:translate-x-2 transition-transform"></i>
             </span>
           </div>
         </div>
       </a>
 
       <!-- Admin Selection -->
-      <a href="/admin-key-verify" class="group">
-        <div class="glass-card gradient-border p-10 h-full flex flex-col items-center text-center transition-all duration-300 hover:bg-slate-800/50">
-          <div class="w-20 h-20 bg-emerald-600/20 text-emerald-400 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(16,185,129,0.2)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]">
-            <i class="fas fa-user-tie text-4xl"></i>
+      <a href="/admin-key-verify" class="group relative">
+        <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+        <div class="glass-card relative p-10 md:p-12 h-full flex flex-col items-center text-center transition-all duration-500 hover:-translate-y-2 border border-white/5 hover:border-emerald-500/30 overflow-hidden">
+          <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+            <i class="fas fa-user-shield text-9xl"></i>
           </div>
-          <h2 class="text-2xl font-bold text-white mb-3">Continue as Admin</h2>
-          <p class="text-slate-400 text-sm mb-6">Manage users, view analytics, and control the platform.</p>
-          <div class="mt-auto">
-            <span class="btn-premium btn-outline border-emerald-500/30 text-emerald-400 group-hover:bg-emerald-500/10 transition-all w-full text-center block uppercase tracking-wider text-xs font-semibold">
-              Admin Portal <i class="fas fa-lock ml-2 text-xs opacity-50"></i>
+          
+          <div class="w-24 h-24 bg-emerald-600/10 text-emerald-400 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-700 shadow-[0_0_30px_rgba(16,185,129,0.15)] group-hover:shadow-[0_0_40px_rgba(16,185,129,0.3)] border border-emerald-500/20">
+            <i class="fas fa-fingerprint text-4xl"></i>
+          </div>
+          
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">Executive Suite</h2>
+          <p class="text-slate-400 text-sm md:text-base mb-8 font-light leading-relaxed">
+            Oversee platform intelligence, manage ecosystem users, and analyze high-level performance metrics.
+          </p>
+          
+          <div class="mt-auto w-full">
+            <span class="btn-premium btn-outline border-emerald-500/30 text-emerald-400 py-4 group-hover:bg-emerald-500/10 transition-all w-full text-center block rounded-2xl text-sm font-bold uppercase tracking-widest">
+              Admin Access <i class="fas fa-shield-halved ml-2 text-[10px]"></i>
             </span>
           </div>
         </div>
@@ -49,3 +71,4 @@
   </div>
 </div>
 {% endblock %}
+

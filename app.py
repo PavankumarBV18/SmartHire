@@ -19,8 +19,8 @@ import io
 import time
 import threading
 from functools import wraps
-import schedule
 from reportlab.lib.pagesizes import letter
+from itertools import zip_longest
 
 from services.job_matcher import add_user, match_jobs, load_users
 from services.email_sender import send_job_alert_email
@@ -31,9 +31,7 @@ from reportlab.lib import colors
 from reportlab.lib.colors import HexColor
 
 # Custom Colors
-teal = HexColor('#008080')
-from itertools import zip_longest
-from functools import wraps
+teal = colors.HexColor('#008080')
 # Load environment variables
 load_dotenv(override=True)
 
@@ -58,7 +56,6 @@ ai_init_error = None
 
 if GROQ_API_KEY and GROQ_API_KEY.strip():
     try:
-        from groq import Groq
         client = Groq(api_key=GROQ_API_KEY)
         print("Groq Client Successfully Initialized.")
     except Exception as e:
@@ -2046,15 +2043,22 @@ def run_daily_job_alerts():
                 send_job_alert_email(email, result["job"], result["matched_skills"])
 
 def start_job_scheduler():
-    """Run daily at 10 AM"""
-    schedule.every().day.at("10:00").do(run_daily_job_alerts)
-    def run_scheduler_loop():
-        while True:
-            schedule.run_pending()
-            time.sleep(60)
-            
-    thread = threading.Thread(target=run_scheduler_loop, daemon=True)
-    thread.start()
+    """
+    Note: Standard background scheduling does not work on Vercel Serverless.
+    This function is kept for local development only.
+    """
+    try:
+        import schedule
+        schedule.every().day.at("10:00").do(run_daily_job_alerts)
+        def run_scheduler_loop():
+            while True:
+                schedule.run_pending()
+                time.sleep(60)
+                
+        thread = threading.Thread(target=run_scheduler_loop, daemon=True)
+        thread.start()
+    except ImportError:
+        print("Schedule library not found. Skipping background scheduler.")
 
 def cleanup_old_files():
     """Remove uploaded files and analysis data older than 1 hour"""
