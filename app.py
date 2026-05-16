@@ -69,8 +69,6 @@ else:
 try:
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs(app.config['ANALYSIS_FOLDER'], exist_ok=True)
-    os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
-    os.makedirs(os.path.join(BASE_DIR, 'templates'), exist_ok=True)
 except Exception as e:
     print(f"Warning: Could not create directories: {e}")
 
