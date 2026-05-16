@@ -4,7 +4,9 @@ module.exports = {
         "./templates/**/*.html",
         "./static/js/**/*.js",
         "./static/src/**/*.css",
-        "./app.py"
+        "./app.py",
+        "./services/**/*.py",
+        "./*.py"
     ],
     theme: {
         extend: {

@@ -1,14 +1,22 @@
 #!/bin/bash
-# Install Node dependencies
+echo "--- Starting Vercel Build ---"
+echo "Current directory: $(pwd)"
+
+# Install dependencies
+echo "Installing Node dependencies..."
 npm install
 
-# Build Tailwind CSS
+# Build CSS
+echo "Building Tailwind CSS..."
 npm run build
 
-# Verify build output
+# Check output
 if [ -f "static/css/output.css" ]; then
-    echo "Tailwind build successful: static/css/output.css generated."
+    echo "SUCCESS: static/css/output.css generated."
+    ls -l static/css/output.css
 else
-    echo "ERROR: Tailwind build failed. static/css/output.css not found."
+    echo "ERROR: static/css/output.css not found!"
     exit 1
 fi
+
+echo "--- Build Finished ---"
