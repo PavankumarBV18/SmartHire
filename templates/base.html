@@ -111,6 +111,15 @@
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-8">
           {% if session.get('user') %}
+          
+          {% if session.get('role') == 'admin' %}
+          <a href="{% if request.path == '/admin-dashboard' %}/dashboard{% else %}/admin-dashboard{% endif %}" 
+             class="text-xs font-bold {% if request.path == '/admin-dashboard' %}text-emerald-400 bg-emerald-500/10 border-emerald-500/20{% else %}text-indigo-400 bg-indigo-500/10 border-indigo-500/20{% endif %} hover:bg-opacity-20 transition-all px-3 py-1.5 rounded-lg border flex items-center gap-2 mr-2">
+            <i class="fas {% if request.path == '/admin-dashboard' %}fa-user{% else %}fa-user-shield{% endif %}"></i>
+            {% if request.path == '/admin-dashboard' %}SWITCH TO USER VIEW{% else %}SWITCH TO ADMIN VIEW{% endif %}
+          </a>
+          {% endif %}
+
           <a href="/dashboard" id="nav-dashboard"
             class="text-sm font-medium text-indigo-400 hover:text-white transition-colors flex items-center gap-1.5">
             <i class="fas fa-tachometer-alt opacity-50"></i> Dashboard
@@ -233,8 +242,9 @@
               <div class="absolute right-0 top-full mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right group-hover:scale-100 scale-95 z-50">
                 <div class="p-2">
                   {% if session.get('role') == 'admin' %}
-                  <a href="/admin-dashboard" class="block px-4 py-2 text-sm text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors font-bold">
-                    <i class="fas fa-tachometer-alt mr-2 opacity-70"></i> Admin Dashboard
+                  <a href="{% if request.path == '/admin-dashboard' %}/dashboard{% else %}/admin-dashboard{% endif %}" class="block px-4 py-2 text-sm {% if request.path == '/admin-dashboard' %}text-emerald-400 hover:bg-emerald-500/10{% else %}text-indigo-400 hover:bg-indigo-500/10{% endif %} rounded-lg transition-colors font-bold">
+                    <i class="fas {% if request.path == '/admin-dashboard' %}fa-user{% else %}fa-tachometer-alt{% endif %} mr-2 opacity-70"></i>
+                    {% if request.path == '/admin-dashboard' %}User Dashboard{% else %}Admin Dashboard{% endif %}
                   </a>
                   <div class="h-px bg-slate-700/50 my-1"></div>
                   {% endif %}
