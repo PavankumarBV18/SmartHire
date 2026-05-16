@@ -36,7 +36,7 @@ teal = colors.HexColor('#008080')
 load_dotenv(override=True)
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.secret_key = os.getenv('SECRET_KEY') or os.urandom(24).hex() # Fallback to random if not set
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 

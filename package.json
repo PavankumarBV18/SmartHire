@@ -2,9 +2,9 @@
   "name": "smarthire-ui",
   "version": "1.0.0",
   "scripts": {
-    "build:css": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --minify",
+    "build:css": "npx tailwindcss -i ./static/src/input.css -o ./static/css/output.css --minify",
     "build": "npm run build:css",
-    "dev": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --watch"
+    "dev": "npx tailwindcss -i ./static/src/input.css -o ./static/css/output.css --watch"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.1",

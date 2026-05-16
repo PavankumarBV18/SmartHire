@@ -6,14 +6,13 @@
       "use": "@vercel/python"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/static/(.*)",
-      "destination": "/static/$1"
+      "handle": "filesystem"
     },
     {
-      "source": "/(.*)",
-      "destination": "/app.py"
+      "src": "/(.*)",
+      "dest": "app.py"
     }
   ]
 }
