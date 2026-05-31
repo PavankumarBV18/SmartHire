@@ -11,7 +11,20 @@ import os
 import json
 import uuid
 from datetime import datetime
-import fitz  # PyMuPDF
+try:
+    import fitz  # PyMuPDF
+    FITZ_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: PyMuPDF failed to import ({e}). Falling back to pure Python PDF parser.")
+    FITZ_AVAILABLE = False
+
+try:
+    import pypdf
+    PYPDF_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: pypdf failed to import ({e}).")
+    PYPDF_AVAILABLE = False
+
 from groq import Groq
 from dotenv import load_dotenv
 import re
@@ -67,12 +80,16 @@ else:
     ai_init_error = "GROQ_API_KEY not found in environment variables."
     print(f"CRITICAL: {ai_init_error}")
 
-# Ensure directories exist (handle potential OS errors in serverless)
-try:
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(app.config['ANALYSIS_FOLDER'], exist_ok=True)
-except Exception as e:
-    print(f"Warning: Could not create directories: {e}")
+def ensure_dirs_exist():
+    """Ensure that upload and analysis directories exist, especially in serverless cold starts"""
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        os.makedirs(app.config['ANALYSIS_FOLDER'], exist_ok=True)
+    except Exception as e:
+        print(f"Warning: Could not create directories: {e}")
+
+# Initial run at startup
+ensure_dirs_exist()
 
 @app.context_processor
 def inject_ai_status():
@@ -85,13 +102,19 @@ def inject_ai_status():
 # ============================================================================
 
 def get_ai_completion(prompt, system_message="You are a helpful assistant.", temperature=0.1, max_tokens=4096, is_json=False):
-    """Helper to call Groq AI"""
-    if client:
+    """Helper to call Groq AI with exponential backoff retries for rate limits and server hiccups"""
+    if not client:
+        raise Exception("Groq AI provider is not available. Please verify your GROQ_API_KEY environment variable.")
+        
+    extra_params = {}
+    if is_json:
+        extra_params["response_format"] = {"type": "json_object"}
+        
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
         try:
-            extra_params = {}
-            if is_json:
-                extra_params["response_format"] = {"type": "json_object"}
-            
             completion = client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=[
@@ -100,15 +123,22 @@ def get_ai_completion(prompt, system_message="You are a helpful assistant.", tem
                 ],
                 temperature=temperature,
                 max_tokens=max_tokens,
-                timeout=25.0,
+                timeout=30.0,
                 **extra_params
             )
             return completion.choices[0].message.content
         except Exception as e:
-            print(f"Groq API Error: {e}")
-            raise e
-
-    raise Exception("Groq AI provider is not available.")
+            err_msg = str(e)
+            print(f"Groq API Error on attempt {attempt+1}/{max_retries}: {err_msg}")
+            
+            # Check for transient errors like 429 rate limit or 503 service unavailable
+            is_transient = any(term in err_msg.lower() for term in ["rate limit", "rate_limit", "429", "timeout", "500", "502", "503", "504"])
+            if is_transient and attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                retry_delay *= 2
+                continue
+                
+            raise Exception(f"AI Completion failed: {err_msg}")
 
 
 # In-memory storage for analysis results (use database in production)
@@ -258,19 +288,37 @@ def allowed_file(filename):
 
 def extract_text_from_pdf(pdf_path):
     """
-    Extract text content from PDF file using PyMuPDF
+    Extract text content from PDF file using PyMuPDF or pypdf as fallback
     Returns: Extracted text as string
     """
-    try:
-        doc = fitz.open(pdf_path)
-        text = ""
-        for page in doc:
-            text += page.get_text() + "\n"
-        doc.close()
-        return text.strip()
-    except Exception as e:
-        print(f"Error extracting text from PDF: {e}")
-        return "" # Return empty string instead of crashing, let validation handle it
+    # 1. Try PyMuPDF if available
+    if FITZ_AVAILABLE:
+        try:
+            doc = fitz.open(pdf_path)
+            text = ""
+            for page in doc:
+                text += page.get_text() + "\n"
+            doc.close()
+            if text.strip():
+                return text.strip()
+        except Exception as e:
+            print(f"PyMuPDF extraction failed: {e}")
+            
+    # 2. Try pypdf fallback
+    if PYPDF_AVAILABLE:
+        try:
+            reader = pypdf.PdfReader(pdf_path)
+            text = ""
+            for page in reader.pages:
+                t = page.extract_text()
+                if t:
+                    text += t + "\n"
+            if text.strip():
+                return text.strip()
+        except Exception as e:
+            print(f"pypdf extraction failed: {e}")
+            
+    return ""
 
 def clean_json_response(text):
     """Clean and parse JSON response from AI"""
@@ -1914,6 +1962,7 @@ def upload_home():
             filename = secure_filename(file.filename)
             unique_filename = f"gen_{uuid.uuid4()}_{filename}"
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            ensure_dirs_exist()
             file.save(filepath)
             
             try:
@@ -2194,6 +2243,7 @@ def analyze_jd():
             # Save analysis
             jd_id = str(uuid.uuid4())
             jd_file = get_writable_path(os.path.join(app.config['ANALYSIS_FOLDER'], f"jd_{jd_id}.json"))
+            ensure_dirs_exist()
             with open(jd_file, 'w') as f:
                 json.dump(analysis_result, f)
             
@@ -2397,6 +2447,7 @@ def analyze_resume():
         filename = secure_filename(file.filename)
         unique_filename = f"ats_{uuid.uuid4()}_{filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        ensure_dirs_exist()
         file.save(filepath)
         
         try:
@@ -2489,9 +2540,6 @@ def suggest_skills():
             if not role:
                 return jsonify({'error': 'Please provide a job role.'}), 400
 
-            if not client:
-                return jsonify({'error': 'Groq client not initialized'}), 500
-
             prompt = f"""
             You are a leading AI Career Expert. Suggest 5 to 10 highly relevant skills based on the following:
             Job Role: {role}
@@ -2503,19 +2551,15 @@ def suggest_skills():
             }}
             """
             
-            completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": "You are a skill suggestion API that outputs valid JSON."},
-                    {"role": "user", "content": prompt}
-                ],
+            response_text = get_ai_completion(
+                prompt=prompt,
+                system_message="You are a skill suggestion API that outputs valid JSON.",
                 temperature=0.7,
                 max_tokens=500,
-                response_format={"type": "json_object"},
-                timeout=25.0
+                is_json=True
             )
             
-            analysis = clean_json_response(completion.choices[0].message.content)
+            analysis = clean_json_response(response_text)
             return jsonify({'success': True, 'skills': analysis.get('skills', [])})
 
         except Exception as e:
@@ -2543,6 +2587,7 @@ def compare_resumes():
             old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(old_file.filename))
             new_filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(new_file.filename))
             
+            ensure_dirs_exist()
             old_file.save(old_filepath)
             new_file.save(new_filepath)
             
@@ -2678,6 +2723,7 @@ def interview_questions():
                 filename = secure_filename(file.filename)
                 unique_filename = f"temp_int_{uuid.uuid4()}_{filename}"
                 filepath_temp = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                ensure_dirs_exist()
                 file.save(filepath_temp)
                 resume_text = extract_text_from_pdf(filepath_temp)
                 try:

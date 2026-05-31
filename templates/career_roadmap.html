@@ -92,6 +92,13 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role: role })
             });
+            if (!response.ok) {
+                const text = await response.text();
+                let errMsg = text;
+                try { errMsg = JSON.parse(text).error || text; } catch(_) {}
+                alert(`Generation failed (${response.status}): ${errMsg}`);
+                return;
+            }
             const data = await response.json();
 
             if (data.success && data.roadmap) {
@@ -136,7 +143,7 @@
                 alert('Generation failed: ' + (data.error || 'Unknown error'));
             }
         } catch (e) {
-            alert('A network error occurred while connecting to the AI.');
+            alert('Request Failed: ' + e.message);
         } finally {
             btn.disabled = false;
             btn.classList.remove('opacity-80', 'cursor-wait');

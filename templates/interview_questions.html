@@ -260,7 +260,15 @@ document.getElementById('generate-form').addEventListener('submit', async functi
   
   try {
     const response = await fetch('/interview-questions', fetchOptions);
-    
+    if (!response.ok) {
+      const text = await response.text();
+      let errMsg = text;
+      try { errMsg = JSON.parse(text).error || text; } catch(_) {}
+      alert(`Generation Failed (${response.status}): ${errMsg}`);
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('initial-state').classList.remove('hidden');
+      return;
+    }
     const data = await response.json();
     
     if(data.success) {
@@ -275,7 +283,7 @@ document.getElementById('generate-form').addEventListener('submit', async functi
     
   } catch (err) {
     console.error(err);
-    alert("System Error: Could not connect to the server.");
+    alert("Request Failed: " + err.message);
     document.getElementById('loading-state').classList.add('hidden');
     document.getElementById('initial-state').classList.remove('hidden');
   } finally {

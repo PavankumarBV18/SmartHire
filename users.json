@@ -100,7 +100,19 @@
         "email": "pavankumarpavan15614@gmail.com",
         "password": "scrypt:32768:8:1$7PbfkALOLA7gnHX1$dec372e86fa91f903944799fbde31f524d3eac61ac03d31ec3c3292194f8cef8c208fca66c0a8ae1148467fba648b69311fa377d4d47b8d72a5447364596b75c",
         "role": "admin",
-        "plan": "premium"
+        "plan": "premium",
+        "skills": [
+            "leadership",
+            "python",
+            "Strategic thinking",
+            "css",
+            "R",
+            "HTML",
+            "communication",
+            "SQL",
+            "Python",
+            "Results-driven"
+        ]
     },
     {
         "email": "makamabhi@gmail.com",

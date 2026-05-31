@@ -147,5 +147,35 @@
         "ats_score": 70,
         "file_path": "uploads\\ats_515dfb4b-e0c4-44d5-aeac-a8f320f774d5_Resume_abhishek_classic_1.pdf",
         "created_at": "2026-05-13 13:32:42"
+    },
+    {
+        "id": "d2d2a53a-7b21-42cc-b321-1fa4b99e82e5",
+        "email": "pavankumarpavan15614@gmail.com",
+        "resume_name": "ATS Analysis - Resume_abhishek_classic.pdf",
+        "skills": [
+            "Python",
+            "R",
+            "SQL",
+            "HTML",
+            "Results-driven",
+            "Strategic thinking"
+        ],
+        "ats_score": 70,
+        "file_path": "E:\\resume backup (3)\\resume backup (2)\\resume backup\\resume 22222\\resume111\\resume111\\SmartHire\\RCATSC\\Resume Creator And ATS\\Resume Creator\\uploads\\ats_3b47bbb0-ab6a-42cf-a903-93f65624e52a_Resume_abhishek_classic.pdf",
+        "created_at": "2026-05-27 16:43:09"
+    },
+    {
+        "id": "7a630966-b0d9-466d-8605-70411b300ac9",
+        "email": "pavankumarpavan15614@gmail.com",
+        "resume_name": "Generated - Resume_abhishek_classic_1.pdf",
+        "skills": [
+            "python",
+            "css",
+            "leadership",
+            "communication"
+        ],
+        "ats_score": null,
+        "file_path": "E:\\resume backup (3)\\resume backup (2)\\resume backup\\resume 22222\\resume111\\resume111\\SmartHire\\RCATSC\\Resume Creator And ATS\\Resume Creator\\uploads\\gen_67d24f91-7419-4cb0-91dd-d9f429b21287_Resume_abhishek_classic_1.pdf",
+        "created_at": "2026-05-27 16:43:51"
     }
 ]

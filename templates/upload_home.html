@@ -306,10 +306,17 @@
 
         try {
             const resp = await fetch('/upload-home', { method: 'POST', body: formData });
+            if (!resp.ok) {
+                const text = await resp.text();
+                let errMsg = text;
+                try { errMsg = JSON.parse(text).error || text; } catch(_) {}
+                alert(`Optimization Failed (${resp.status}): ${errMsg}`);
+                return;
+            }
             const data = await resp.json();
             if (data.success) window.location.href = data.redirect;
             else alert('Optimization Failed: ' + (data.error || 'Server error'));
-        } catch (err) { alert('Network Error'); }
+        } catch (err) { alert('Request Failed: ' + err.message); }
         finally { toggleLoading(btn, btnText, loadingText, false); }
     });
 
@@ -329,10 +336,17 @@
 
         try {
             const resp = await fetch('/analyze-resume', { method: 'POST', body: formData });
+            if (!resp.ok) {
+                const text = await resp.text();
+                let errMsg = text;
+                try { errMsg = JSON.parse(text).error || text; } catch(_) {}
+                alert(`Audit Failed (${resp.status}): ${errMsg}`);
+                return;
+            }
             const data = await resp.json();
             if (data.success) window.location.href = data.redirect;
             else alert('Audit Failed: ' + data.error);
-        } catch (err) { alert('Network Error'); }
+        } catch (err) { alert('Request Failed: ' + err.message); }
         finally { toggleLoading(btn, btnText, loadingText, false); }
     });
 

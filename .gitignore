@@ -21,3 +21,12 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Large standalone executables
+tailwind.exe
+tailwind3.exe
+
+# Dynamic uploads and analysis output folders
+uploads/
+analysis_data/
+
