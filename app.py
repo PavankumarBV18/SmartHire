@@ -172,10 +172,39 @@ def get_current_user():
             return u
     return None
 
+def wants_json():
+    """Helper to detect if the request expects or prefers a JSON API response."""
+    if request.path.startswith('/api/'):
+        return True
+    if request.is_json:
+        return True
+    accept = request.headers.get('Accept', '')
+    if 'application/json' in accept:
+        return True
+    api_routes = [
+        '/suggest-skills', 
+        '/compare-resumes', 
+        '/interview-questions', 
+        '/generate-roadmap', 
+        '/generate-summary', 
+        '/analyze-resume', 
+        '/market-demand', 
+        '/rewrite-section',
+        '/upload-home'
+    ]
+    if request.method == 'POST' and any(request.path.startswith(r) for r in api_routes):
+        return True
+    return False
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('user'):
+            if wants_json():
+                return jsonify({
+                    "success": False,
+                    "error": "Authentication required. Please log in."
+                }), 401
             from flask import flash
             flash("Please login to continue.", "info")
             return redirect(url_for('login'))
@@ -186,6 +215,11 @@ def premium_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('user'):
+            if wants_json():
+                return jsonify({
+                    "success": False,
+                    "error": "Authentication required. Please log in."
+                }), 401
             from flask import flash
             flash("Please login to continue.", "info")
             return redirect(url_for('login'))
@@ -194,6 +228,11 @@ def premium_required(f):
             return f(*args, **kwargs)
         if user and (user.get('role') == 'admin' or user.get('plan') == 'premium'):
             return f(*args, **kwargs)
+        if wants_json():
+            return jsonify({
+                "success": False,
+                "error": "Premium subscription required to access this feature."
+            }), 403
         return render_template('premium_locked.html')
     return decorated_function
 
@@ -201,6 +240,11 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('user') or session.get('role') != 'admin':
+            if wants_json():
+                return jsonify({
+                    "success": False,
+                    "error": "Admin privileges required."
+                }), 403
             from flask import flash
             flash("Admin access required.", "error")
             return redirect(url_for('admin_login'))
@@ -212,13 +256,41 @@ def admin_required(f):
 
 @app.errorhandler(404)
 def not_found_error(error):
+    if wants_json():
+        return jsonify({
+            "success": False,
+            "error": "The requested API endpoint was not found on this server."
+        }), 404
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def internal_error(error):
     import traceback
-    print(f"DEBUG: 500 Error: {error}")
-    traceback.print_exc()
+    app.logger.exception(error)
+    if wants_json():
+        return jsonify({
+            "success": False,
+            "error": "An internal server error occurred while processing your request."
+        }), 500
+    return render_template('500.html'), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        if wants_json():
+            return jsonify({
+                "success": False,
+                "error": e.description
+            }), e.code
+        return e
+        
+    app.logger.exception(e)
+    if wants_json():
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
     return render_template('500.html'), 500
 
 @app.route('/health')
